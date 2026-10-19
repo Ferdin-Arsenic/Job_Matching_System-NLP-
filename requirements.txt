@@ -1,0 +1,14 @@
+kagglehub
+datasets
+pyarrow
+pandas
+numpy
+scipy
+scikit-learn
+sklearn-crfsuite
+nltk
+transformers
+torch
+matplotlib
+seaborn
+wordcloud
