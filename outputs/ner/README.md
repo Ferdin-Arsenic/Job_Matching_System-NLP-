@@ -2,6 +2,7 @@
 
 Model: **JobBERT-CRF**: `jjzha/jobbert-base-cased` + lapisan CRF, data varian **B** (`notebooks/task1_ner.ipynb`, `notebooks/task1_ner_crf.ipynb`).
 Dibuat dengan `python scripts/t1_ner_predict.py --export` lalu `python scripts/t1_export_outputs.py`. Untuk teks baru: `from t1_ner_predict import load, extract`.
+Model ada di Hugging Face: [WwzFwz/jobbert-crf-cv-jd-ner](https://huggingface.co/WwzFwz/jobbert-crf-cv-jd-ner) (publik). `load()` mengunduhnya otomatis ke `models/ner_jobbert_crf/` jika folder itu belum ada, tanpa login.
 File di sini **tidak berisi teks CV/JD**; gabungkan ke dataset asli lewat `text_md5`.
 
 ## File
