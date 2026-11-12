@@ -1,4 +1,5 @@
 """Task 1: inference NER dengan model final JobBERT-CRF (models/ner_jobbert_crf, dilatih di notebooks/task1_ner_crf.ipynb).
+Jika folder model belum ada, model diunduh otomatis dari Hugging Face Hub (HF_REPO).
 
 Pakai sebagai modul:
     from t1_ner_predict import load, extract
@@ -8,14 +9,14 @@ Pakai sebagai modul:
 Atau buat ulang prediksi untuk data tim (data/ner_pred_*.parquet), lalu jalankan scripts/t1_export_outputs.py:
     python scripts/t1_ner_predict.py --export
 """
-import re, sys
+import os, re, sys
 from pathlib import Path
 import numpy as np, pandas as pd, torch
 from transformers import AutoConfig, AutoModel, AutoTokenizer
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR, DATA = ROOT / "models" / "ner_jobbert_crf", ROOT / "data"
-JOBBERT = "jjzha/jobbert-base-cased"
+HF_REPO = os.environ.get("T1_NER_REPO", "WwzFwz/jobbert-crf-cv-jd-ner")   # repo model di Hugging Face Hub
 DEV = "cuda" if torch.cuda.is_available() else "cpu"
 ENTITIES = ["SKILL", "JOB_TITLE", "EDUCATION", "EXPERIENCE"]
 TAGS = ["O"] + [f"{p}-{L}" for L in ENTITIES for p in "BI"]; NT = len(TAGS)
@@ -40,10 +41,19 @@ class BertCRF(torch.nn.Module):
         return self.emit(self.drop(self.bert(input_ids=ids, attention_mask=att).last_hidden_state))
 
 
-def load(model_dir=MODEL_DIR):
-    cfg_dir = model_dir if (model_dir / "config.json").exists() else JOBBERT
-    model = BertCRF(AutoConfig.from_pretrained(cfg_dir))
-    model.load_state_dict(torch.load(model_dir / "model.pt", map_location="cpu"))
+def load(model_dir=MODEL_DIR, repo_id=HF_REPO):
+    """Muat model dari models/ner_jobbert_crf; jika belum ada, unduh dari Hugging Face Hub (repo publik, tanpa login)."""
+    model_dir = Path(model_dir)
+    if not (model_dir / "model.safetensors").exists() and not (model_dir / "model.pt").exists():
+        from huggingface_hub import snapshot_download
+        snapshot_download(repo_id, local_dir=model_dir, allow_patterns=["*.json", "*.txt", "*.safetensors"])
+    model = BertCRF(AutoConfig.from_pretrained(model_dir))
+    if (model_dir / "model.safetensors").exists():
+        from safetensors.torch import load_file
+        state = load_file(model_dir / "model.safetensors")
+    else:
+        state = torch.load(model_dir / "model.pt", map_location="cpu", weights_only=True)
+    model.load_state_dict(state)
     return model.to(DEV).eval(), AutoTokenizer.from_pretrained(model_dir)
 
 
