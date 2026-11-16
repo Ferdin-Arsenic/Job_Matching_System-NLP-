@@ -1,4 +1,7 @@
-data/
+data/*
+!data/splits/
+!data/cache/
+!data/results/
 __pycache__/
 .ipynb_checkpoints/
 figures/
