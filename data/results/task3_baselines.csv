@@ -1,0 +1,511 @@
+model,seed,split,metric,value
+Majority / mean,42,val,macro_F1,0.22338568935427575
+Majority / mean,42,val,MAE,22.239764625329762
+Majority / mean,42,val,Spearman,
+Majority / mean,42,val,ROC_AUC,0.5
+Majority / mean,42,val,P_No Fit,0.5039370078740157
+Majority / mean,42,val,R_No Fit,1.0
+Majority / mean,42,val,F1_No Fit,0.6701570680628273
+Majority / mean,42,val,P_Potential Fit,0.0
+Majority / mean,42,val,R_Potential Fit,0.0
+Majority / mean,42,val,F1_Potential Fit,0.0
+Majority / mean,42,val,P_Good Fit,0.0
+Majority / mean,42,val,R_Good Fit,0.0
+Majority / mean,42,val,F1_Good Fit,0.0
+Majority / mean,42,val,Spearman_per_job,
+Majority / mean,42,val,NDCG@5,0.5211918335900849
+Majority / mean,42,val,MRR,0.5427350427350427
+Majority / mean,42,val,n_jobs_ranked,22.0
+Resume prior (no job),42,val,macro_F1,0.41288789461069514
+Resume prior (no job),42,val,MAE,21.025365681467296
+Resume prior (no job),42,val,Spearman,0.21217704145666938
+Resume prior (no job),42,val,ROC_AUC,0.6331757694617361
+Resume prior (no job),42,val,P_No Fit,0.5637755102040817
+Resume prior (no job),42,val,R_No Fit,0.690625
+Resume prior (no job),42,val,F1_No Fit,0.6207865168539326
+Resume prior (no job),42,val,P_Potential Fit,0.3269230769230769
+Resume prior (no job),42,val,R_Potential Fit,0.2138364779874214
+Resume prior (no job),42,val,F1_Potential Fit,0.2585551330798479
+Resume prior (no job),42,val,P_Good Fit,0.381294964028777
+Resume prior (no job),42,val,R_Good Fit,0.33974358974358976
+Resume prior (no job),42,val,F1_Good Fit,0.3593220338983051
+Resume prior (no job),42,val,Spearman_per_job,0.212191287460643
+Resume prior (no job),42,val,NDCG@5,0.6317376240929614
+Resume prior (no job),42,val,MRR,0.4967948717948717
+Resume prior (no job),42,val,n_jobs_ranked,22.0
+BM25 (raw),42,val,macro_F1,0.22338568935427575
+BM25 (raw),42,val,MAE,22.605553399227503
+BM25 (raw),42,val,Spearman,0.17454683817082728
+BM25 (raw),42,val,ROC_AUC,0.5906480875825553
+BM25 (raw),42,val,P_No Fit,0.5039370078740157
+BM25 (raw),42,val,R_No Fit,1.0
+BM25 (raw),42,val,F1_No Fit,0.6701570680628273
+BM25 (raw),42,val,P_Potential Fit,0.0
+BM25 (raw),42,val,R_Potential Fit,0.0
+BM25 (raw),42,val,F1_Potential Fit,0.0
+BM25 (raw),42,val,P_Good Fit,0.0
+BM25 (raw),42,val,R_Good Fit,0.0
+BM25 (raw),42,val,F1_Good Fit,0.0
+BM25 (raw),42,val,Spearman_per_job,0.12217476724193502
+BM25 (raw),42,val,NDCG@5,0.6123916201540087
+BM25 (raw),42,val,MRR,0.6025641025641025
+BM25 (raw),42,val,n_jobs_ranked,22.0
+BM25 (z per job),42,val,macro_F1,0.2444756735801512
+BM25 (z per job),42,val,MAE,21.71213569572386
+BM25 (z per job),42,val,Spearman,0.16767548046331052
+BM25 (z per job),42,val,ROC_AUC,0.5797214617216735
+BM25 (z per job),42,val,P_No Fit,0.5048543689320388
+BM25 (z per job),42,val,R_No Fit,0.975
+BM25 (z per job),42,val,F1_No Fit,0.6652452025586354
+BM25 (z per job),42,val,P_Potential Fit,0.35294117647058826
+BM25 (z per job),42,val,R_Potential Fit,0.03773584905660377
+BM25 (z per job),42,val,F1_Potential Fit,0.06818181818181818
+BM25 (z per job),42,val,P_Good Fit,0.0
+BM25 (z per job),42,val,R_Good Fit,0.0
+BM25 (z per job),42,val,F1_Good Fit,0.0
+BM25 (z per job),42,val,Spearman_per_job,0.10656245641446799
+BM25 (z per job),42,val,NDCG@5,0.6767564432625772
+BM25 (z per job),42,val,MRR,0.6442307692307693
+BM25 (z per job),42,val,n_jobs_ranked,22.0
+SBERT cosine,42,val,macro_F1,0.27820173001011783
+SBERT cosine,42,val,MAE,21.055845848383868
+SBERT cosine,42,val,Spearman,0.23579848578437637
+SBERT cosine,42,val,ROC_AUC,0.6228093190927863
+SBERT cosine,42,val,P_No Fit,0.5188356164383562
+SBERT cosine,42,val,R_No Fit,0.946875
+SBERT cosine,42,val,F1_No Fit,0.6703539823008849
+SBERT cosine,42,val,P_Potential Fit,0.0
+SBERT cosine,42,val,R_Potential Fit,0.0
+SBERT cosine,42,val,F1_Potential Fit,0.0
+SBERT cosine,42,val,P_Good Fit,0.3333333333333333
+SBERT cosine,42,val,R_Good Fit,0.10897435897435898
+SBERT cosine,42,val,F1_Good Fit,0.1642512077294686
+SBERT cosine,42,val,Spearman_per_job,0.2860869079511307
+SBERT cosine,42,val,NDCG@5,0.7631537228637467
+SBERT cosine,42,val,MRR,0.8102564102564103
+SBERT cosine,42,val,n_jobs_ranked,22.0
+Majority / mean,42,test,macro_F1,0.2222222222222222
+Majority / mean,42,test,MAE,22.479375
+Majority / mean,42,test,Spearman,
+Majority / mean,42,test,ROC_AUC,0.5
+Majority / mean,42,test,P_No Fit,0.5
+Majority / mean,42,test,R_No Fit,1.0
+Majority / mean,42,test,F1_No Fit,0.6666666666666666
+Majority / mean,42,test,P_Potential Fit,0.0
+Majority / mean,42,test,R_Potential Fit,0.0
+Majority / mean,42,test,F1_Potential Fit,0.0
+Majority / mean,42,test,P_Good Fit,0.0
+Majority / mean,42,test,R_Good Fit,0.0
+Majority / mean,42,test,F1_Good Fit,0.0
+Majority / mean,42,test,Spearman_per_job,
+Majority / mean,42,test,NDCG@5,0.5901003574620615
+Majority / mean,42,test,MRR,0.54
+Majority / mean,42,test,n_jobs_ranked,23.0
+Resume prior (no job),42,test,macro_F1,0.3674433901617482
+Resume prior (no job),42,test,MAE,20.761386633428145
+Resume prior (no job),42,test,Spearman,0.23462590989778206
+Resume prior (no job),42,test,ROC_AUC,0.6021491217198758
+Resume prior (no job),42,test,P_No Fit,0.5501066098081023
+Resume prior (no job),42,test,R_No Fit,0.7865853658536586
+Resume prior (no job),42,test,F1_No Fit,0.6474278544542033
+Resume prior (no job),42,test,P_Potential Fit,0.3627450980392157
+Resume prior (no job),42,test,R_Potential Fit,0.22560975609756098
+Resume prior (no job),42,test,F1_Potential Fit,0.2781954887218045
+Resume prior (no job),42,test,P_Good Fit,0.25882352941176473
+Resume prior (no job),42,test,R_Good Fit,0.13414634146341464
+Resume prior (no job),42,test,F1_Good Fit,0.17670682730923695
+Resume prior (no job),42,test,Spearman_per_job,0.16823036765288107
+Resume prior (no job),42,test,NDCG@5,0.5878956291188977
+Resume prior (no job),42,test,MRR,0.545
+Resume prior (no job),42,test,n_jobs_ranked,23.0
+BM25 (raw),42,test,macro_F1,0.2222222222222222
+BM25 (raw),42,test,MAE,22.790760555444326
+BM25 (raw),42,test,Spearman,-0.0673165602441781
+BM25 (raw),42,test,ROC_AUC,0.5044244497323023
+BM25 (raw),42,test,P_No Fit,0.5
+BM25 (raw),42,test,R_No Fit,1.0
+BM25 (raw),42,test,F1_No Fit,0.6666666666666666
+BM25 (raw),42,test,P_Potential Fit,0.0
+BM25 (raw),42,test,R_Potential Fit,0.0
+BM25 (raw),42,test,F1_Potential Fit,0.0
+BM25 (raw),42,test,P_Good Fit,0.0
+BM25 (raw),42,test,R_Good Fit,0.0
+BM25 (raw),42,test,F1_Good Fit,0.0
+BM25 (raw),42,test,Spearman_per_job,-0.006471118091452073
+BM25 (raw),42,test,NDCG@5,0.6225258637114096
+BM25 (raw),42,test,MRR,0.6950000000000001
+BM25 (raw),42,test,n_jobs_ranked,23.0
+BM25 (z per job),42,test,macro_F1,0.24120373719443314
+BM25 (z per job),42,test,MAE,22.032562670439557
+BM25 (z per job),42,test,Spearman,0.11011836890347791
+BM25 (z per job),42,test,ROC_AUC,0.564552143234847
+BM25 (z per job),42,test,P_No Fit,0.5086887835703001
+BM25 (z per job),42,test,R_No Fit,0.9817073170731707
+BM25 (z per job),42,test,F1_No Fit,0.6701352757544224
+BM25 (z per job),42,test,P_Potential Fit,0.21739130434782608
+BM25 (z per job),42,test,R_Potential Fit,0.03048780487804878
+BM25 (z per job),42,test,F1_Potential Fit,0.053475935828877004
+BM25 (z per job),42,test,P_Good Fit,0.0
+BM25 (z per job),42,test,R_Good Fit,0.0
+BM25 (z per job),42,test,F1_Good Fit,0.0
+BM25 (z per job),42,test,Spearman_per_job,0.0071106135108964805
+BM25 (z per job),42,test,NDCG@5,0.5754863897806031
+BM25 (z per job),42,test,MRR,0.72
+BM25 (z per job),42,test,n_jobs_ranked,23.0
+SBERT cosine,42,test,macro_F1,0.3208781766234882
+SBERT cosine,42,test,MAE,21.530873079881435
+SBERT cosine,42,test,Spearman,0.201126713339255
+SBERT cosine,42,test,ROC_AUC,0.5842235937603278
+SBERT cosine,42,test,P_No Fit,0.5170556552962298
+SBERT cosine,42,test,R_No Fit,0.8780487804878049
+SBERT cosine,42,test,F1_No Fit,0.6508474576271186
+SBERT cosine,42,test,P_Potential Fit,0.0
+SBERT cosine,42,test,R_Potential Fit,0.0
+SBERT cosine,42,test,F1_Potential Fit,0.0
+SBERT cosine,42,test,P_Good Fit,0.41414141414141414
+SBERT cosine,42,test,R_Good Fit,0.25
+SBERT cosine,42,test,F1_Good Fit,0.311787072243346
+SBERT cosine,42,test,Spearman_per_job,0.19624057299821238
+SBERT cosine,42,test,NDCG@5,0.6288937409989542
+SBERT cosine,42,test,MRR,0.8166666666666667
+SBERT cosine,42,test,n_jobs_ranked,23.0
+Majority / mean,43,val,macro_F1,0.2222222222222222
+Majority / mean,43,val,MAE,22.3578526645768
+Majority / mean,43,val,Spearman,
+Majority / mean,43,val,ROC_AUC,0.5
+Majority / mean,43,val,P_No Fit,0.5
+Majority / mean,43,val,R_No Fit,1.0
+Majority / mean,43,val,F1_No Fit,0.6666666666666666
+Majority / mean,43,val,P_Potential Fit,0.0
+Majority / mean,43,val,R_Potential Fit,0.0
+Majority / mean,43,val,F1_Potential Fit,0.0
+Majority / mean,43,val,P_Good Fit,0.0
+Majority / mean,43,val,R_Good Fit,0.0
+Majority / mean,43,val,F1_Good Fit,0.0
+Majority / mean,43,val,Spearman_per_job,
+Majority / mean,43,val,NDCG@5,0.5372637861768332
+Majority / mean,43,val,MRR,0.5933862433862434
+Majority / mean,43,val,n_jobs_ranked,22.0
+Resume prior (no job),43,val,macro_F1,0.42560207765551655
+Resume prior (no job),43,val,MAE,21.089046526470458
+Resume prior (no job),43,val,Spearman,0.20711467172504164
+Resume prior (no job),43,val,ROC_AUC,0.5949341178627611
+Resume prior (no job),43,val,P_No Fit,0.5621761658031088
+Resume prior (no job),43,val,R_No Fit,0.6802507836990596
+Resume prior (no job),43,val,F1_No Fit,0.6156028368794326
+Resume prior (no job),43,val,P_Potential Fit,0.33093525179856115
+Resume prior (no job),43,val,R_Potential Fit,0.2839506172839506
+Resume prior (no job),43,val,F1_Potential Fit,0.30564784053156147
+Resume prior (no job),43,val,P_Good Fit,0.4247787610619469
+Resume prior (no job),43,val,R_Good Fit,0.3057324840764331
+Resume prior (no job),43,val,F1_Good Fit,0.35555555555555557
+Resume prior (no job),43,val,Spearman_per_job,0.21577895724920693
+Resume prior (no job),43,val,NDCG@5,0.6056667079570505
+Resume prior (no job),43,val,MRR,0.6694444444444444
+Resume prior (no job),43,val,n_jobs_ranked,22.0
+BM25 (raw),43,val,macro_F1,0.22245467224546722
+BM25 (raw),43,val,MAE,22.31380282822865
+BM25 (raw),43,val,Spearman,0.16066132638007632
+BM25 (raw),43,val,ROC_AUC,0.5647041363378247
+BM25 (raw),43,val,P_No Fit,0.5007849293563579
+BM25 (raw),43,val,R_No Fit,1.0
+BM25 (raw),43,val,F1_No Fit,0.6673640167364017
+BM25 (raw),43,val,P_Potential Fit,0.0
+BM25 (raw),43,val,R_Potential Fit,0.0
+BM25 (raw),43,val,F1_Potential Fit,0.0
+BM25 (raw),43,val,P_Good Fit,0.0
+BM25 (raw),43,val,R_Good Fit,0.0
+BM25 (raw),43,val,F1_Good Fit,0.0
+BM25 (raw),43,val,Spearman_per_job,0.15400160553020223
+BM25 (raw),43,val,NDCG@5,0.6596719380640139
+BM25 (raw),43,val,MRR,0.6916666666666668
+BM25 (raw),43,val,n_jobs_ranked,22.0
+BM25 (z per job),43,val,macro_F1,0.23203367585390056
+BM25 (z per job),43,val,MAE,21.713460739515764
+BM25 (z per job),43,val,Spearman,0.13536411179300378
+BM25 (z per job),43,val,ROC_AUC,0.5828200212462837
+BM25 (z per job),43,val,P_No Fit,0.5024311183144247
+BM25 (z per job),43,val,R_No Fit,0.9717868338557993
+BM25 (z per job),43,val,F1_No Fit,0.6623931623931624
+BM25 (z per job),43,val,P_Potential Fit,0.0
+BM25 (z per job),43,val,R_Potential Fit,0.0
+BM25 (z per job),43,val,F1_Potential Fit,0.0
+BM25 (z per job),43,val,P_Good Fit,0.14285714285714285
+BM25 (z per job),43,val,R_Good Fit,0.01910828025477707
+BM25 (z per job),43,val,F1_Good Fit,0.033707865168539325
+BM25 (z per job),43,val,Spearman_per_job,0.16855765701326264
+BM25 (z per job),43,val,NDCG@5,0.7067078602716517
+BM25 (z per job),43,val,MRR,0.7666666666666666
+BM25 (z per job),43,val,n_jobs_ranked,22.0
+SBERT cosine,43,val,macro_F1,0.2532899576596754
+SBERT cosine,43,val,MAE,21.472776578945055
+SBERT cosine,43,val,Spearman,0.1603751517561638
+SBERT cosine,43,val,ROC_AUC,0.5962837774439019
+SBERT cosine,43,val,P_No Fit,0.5151515151515151
+SBERT cosine,43,val,R_No Fit,0.9592476489028213
+SBERT cosine,43,val,F1_No Fit,0.6703176341730559
+SBERT cosine,43,val,P_Potential Fit,0.0
+SBERT cosine,43,val,R_Potential Fit,0.0
+SBERT cosine,43,val,F1_Potential Fit,0.0
+SBERT cosine,43,val,P_Good Fit,0.20454545454545456
+SBERT cosine,43,val,R_Good Fit,0.05732484076433121
+SBERT cosine,43,val,F1_Good Fit,0.08955223880597014
+SBERT cosine,43,val,Spearman_per_job,0.27574201806472104
+SBERT cosine,43,val,NDCG@5,0.7511477487551749
+SBERT cosine,43,val,MRR,0.8333333333333334
+SBERT cosine,43,val,n_jobs_ranked,22.0
+Majority / mean,43,test,macro_F1,0.22338568935427575
+Majority / mean,43,test,MAE,22.302510824649175
+Majority / mean,43,test,Spearman,
+Majority / mean,43,test,ROC_AUC,0.5
+Majority / mean,43,test,P_No Fit,0.5039370078740157
+Majority / mean,43,test,R_No Fit,1.0
+Majority / mean,43,test,F1_No Fit,0.6701570680628273
+Majority / mean,43,test,P_Potential Fit,0.0
+Majority / mean,43,test,R_Potential Fit,0.0
+Majority / mean,43,test,F1_Potential Fit,0.0
+Majority / mean,43,test,P_Good Fit,0.0
+Majority / mean,43,test,R_Good Fit,0.0
+Majority / mean,43,test,F1_Good Fit,0.0
+Majority / mean,43,test,Spearman_per_job,
+Majority / mean,43,test,NDCG@5,0.5357259918042394
+Majority / mean,43,test,MRR,0.6148148148148148
+Majority / mean,43,test,n_jobs_ranked,22.0
+Resume prior (no job),43,test,macro_F1,0.43964668836023896
+Resume prior (no job),43,test,MAE,19.836460566377294
+Resume prior (no job),43,test,Spearman,0.3290241996329071
+Resume prior (no job),43,test,ROC_AUC,0.653798272842995
+Resume prior (no job),43,test,P_No Fit,0.5995260663507109
+Resume prior (no job),43,test,R_No Fit,0.790625
+Resume prior (no job),43,test,F1_No Fit,0.6819407008086253
+Resume prior (no job),43,test,P_Potential Fit,0.3515625
+Resume prior (no job),43,test,R_Potential Fit,0.2848101265822785
+Resume prior (no job),43,test,F1_Potential Fit,0.3146853146853147
+Resume prior (no job),43,test,P_Good Fit,0.4588235294117647
+Resume prior (no job),43,test,R_Good Fit,0.2484076433121019
+Resume prior (no job),43,test,F1_Good Fit,0.32231404958677684
+Resume prior (no job),43,test,Spearman_per_job,0.3089779139080559
+Resume prior (no job),43,test,NDCG@5,0.724870403134275
+Resume prior (no job),43,test,MRR,0.7222222222222222
+Resume prior (no job),43,test,n_jobs_ranked,22.0
+BM25 (raw),43,test,macro_F1,0.22385449457852394
+BM25 (raw),43,test,MAE,22.694900726227516
+BM25 (raw),43,test,Spearman,-0.02498016181658159
+BM25 (raw),43,test,ROC_AUC,0.5094313862425736
+BM25 (raw),43,test,P_No Fit,0.5055292259083728
+BM25 (raw),43,test,R_No Fit,1.0
+BM25 (raw),43,test,F1_No Fit,0.6715634837355718
+BM25 (raw),43,test,P_Potential Fit,0.0
+BM25 (raw),43,test,R_Potential Fit,0.0
+BM25 (raw),43,test,F1_Potential Fit,0.0
+BM25 (raw),43,test,P_Good Fit,0.0
+BM25 (raw),43,test,R_Good Fit,0.0
+BM25 (raw),43,test,F1_Good Fit,0.0
+BM25 (raw),43,test,Spearman_per_job,0.12371776130015934
+BM25 (raw),43,test,NDCG@5,0.5971280077916382
+BM25 (raw),43,test,MRR,0.5814814814814815
+BM25 (raw),43,test,n_jobs_ranked,22.0
+BM25 (z per job),43,test,macro_F1,0.2616436178667938
+BM25 (z per job),43,test,MAE,21.576920577774324
+BM25 (z per job),43,test,Spearman,0.17026518879773786
+BM25 (z per job),43,test,ROC_AUC,0.5877226430005729
+BM25 (z per job),43,test,P_No Fit,0.5130718954248366
+BM25 (z per job),43,test,R_No Fit,0.98125
+BM25 (z per job),43,test,F1_No Fit,0.6738197424892703
+BM25 (z per job),43,test,P_Potential Fit,0.0
+BM25 (z per job),43,test,R_Potential Fit,0.0
+BM25 (z per job),43,test,F1_Potential Fit,0.0
+BM25 (z per job),43,test,P_Good Fit,0.43478260869565216
+BM25 (z per job),43,test,R_Good Fit,0.06369426751592357
+BM25 (z per job),43,test,F1_Good Fit,0.1111111111111111
+BM25 (z per job),43,test,Spearman_per_job,0.2057844283914588
+BM25 (z per job),43,test,NDCG@5,0.6553448283606998
+BM25 (z per job),43,test,MRR,0.6574074074074073
+BM25 (z per job),43,test,n_jobs_ranked,22.0
+SBERT cosine,43,test,macro_F1,0.3129711121089657
+SBERT cosine,43,test,MAE,21.06159733353262
+SBERT cosine,43,test,Spearman,0.2580560098011675
+SBERT cosine,43,test,ROC_AUC,0.6237282599052809
+SBERT cosine,43,test,P_No Fit,0.5264150943396226
+SBERT cosine,43,test,R_No Fit,0.871875
+SBERT cosine,43,test,F1_No Fit,0.6564705882352941
+SBERT cosine,43,test,P_Potential Fit,0.0
+SBERT cosine,43,test,R_Potential Fit,0.0
+SBERT cosine,43,test,F1_Potential Fit,0.0
+SBERT cosine,43,test,P_Good Fit,0.3523809523809524
+SBERT cosine,43,test,R_Good Fit,0.2356687898089172
+SBERT cosine,43,test,F1_Good Fit,0.2824427480916031
+SBERT cosine,43,test,Spearman_per_job,0.29982024216972775
+SBERT cosine,43,test,NDCG@5,0.7255019005942765
+SBERT cosine,43,test,MRR,0.8148148148148148
+SBERT cosine,43,test,n_jobs_ranked,22.0
+Majority / mean,44,val,macro_F1,0.22268760907504362
+Majority / mean,44,val,MAE,22.285462941394695
+Majority / mean,44,val,Spearman,
+Majority / mean,44,val,ROC_AUC,0.5
+Majority / mean,44,val,P_No Fit,0.5015723270440252
+Majority / mean,44,val,R_No Fit,1.0
+Majority / mean,44,val,F1_No Fit,0.6680628272251309
+Majority / mean,44,val,P_Potential Fit,0.0
+Majority / mean,44,val,R_Potential Fit,0.0
+Majority / mean,44,val,F1_Potential Fit,0.0
+Majority / mean,44,val,P_Good Fit,0.0
+Majority / mean,44,val,R_Good Fit,0.0
+Majority / mean,44,val,F1_Good Fit,0.0
+Majority / mean,44,val,Spearman_per_job,
+Majority / mean,44,val,NDCG@5,0.5539234424425572
+Majority / mean,44,val,MRR,0.46388888888888874
+Majority / mean,44,val,n_jobs_ranked,23.0
+Resume prior (no job),44,val,macro_F1,0.3961062177856071
+Resume prior (no job),44,val,MAE,21.51075265121078
+Resume prior (no job),44,val,Spearman,0.17786443577789124
+Resume prior (no job),44,val,ROC_AUC,0.5974687192429313
+Resume prior (no job),44,val,P_No Fit,0.5336426914153132
+Resume prior (no job),44,val,R_No Fit,0.7210031347962382
+Resume prior (no job),44,val,F1_No Fit,0.6133333333333333
+Resume prior (no job),44,val,P_Potential Fit,0.32673267326732675
+Resume prior (no job),44,val,R_Potential Fit,0.20496894409937888
+Resume prior (no job),44,val,F1_Potential Fit,0.25190839694656486
+Resume prior (no job),44,val,P_Good Fit,0.40384615384615385
+Resume prior (no job),44,val,R_Good Fit,0.2692307692307692
+Resume prior (no job),44,val,F1_Good Fit,0.3230769230769231
+Resume prior (no job),44,val,Spearman_per_job,0.2296822075226753
+Resume prior (no job),44,val,NDCG@5,0.6022189541647593
+Resume prior (no job),44,val,MRR,0.52
+Resume prior (no job),44,val,n_jobs_ranked,23.0
+BM25 (raw),44,val,macro_F1,0.2224561403508772
+BM25 (raw),44,val,MAE,22.227495361684454
+BM25 (raw),44,val,Spearman,0.1484050645901153
+BM25 (raw),44,val,ROC_AUC,0.6126588807665349
+BM25 (raw),44,val,P_No Fit,0.5023771790808241
+BM25 (raw),44,val,R_No Fit,0.9937304075235109
+BM25 (raw),44,val,F1_No Fit,0.6673684210526316
+BM25 (raw),44,val,P_Potential Fit,0.0
+BM25 (raw),44,val,R_Potential Fit,0.0
+BM25 (raw),44,val,F1_Potential Fit,0.0
+BM25 (raw),44,val,P_Good Fit,0.0
+BM25 (raw),44,val,R_Good Fit,0.0
+BM25 (raw),44,val,F1_Good Fit,0.0
+BM25 (raw),44,val,Spearman_per_job,0.16116777058974768
+BM25 (raw),44,val,NDCG@5,0.6296230091702812
+BM25 (raw),44,val,MRR,0.5583333333333333
+BM25 (raw),44,val,n_jobs_ranked,23.0
+BM25 (z per job),44,val,macro_F1,0.23754789272030652
+BM25 (z per job),44,val,MAE,21.663059950728094
+BM25 (z per job),44,val,Spearman,0.17094829140010917
+BM25 (z per job),44,val,ROC_AUC,0.5839871820133758
+BM25 (z per job),44,val,P_No Fit,0.5040128410914928
+BM25 (z per job),44,val,R_No Fit,0.9843260188087775
+BM25 (z per job),44,val,F1_No Fit,0.6666666666666666
+BM25 (z per job),44,val,P_Potential Fit,0.3076923076923077
+BM25 (z per job),44,val,R_Potential Fit,0.024844720496894408
+BM25 (z per job),44,val,F1_Potential Fit,0.04597701149425287
+BM25 (z per job),44,val,P_Good Fit,0.0
+BM25 (z per job),44,val,R_Good Fit,0.0
+BM25 (z per job),44,val,F1_Good Fit,0.0
+BM25 (z per job),44,val,Spearman_per_job,0.22808810422066775
+BM25 (z per job),44,val,NDCG@5,0.6751405292231945
+BM25 (z per job),44,val,MRR,0.775
+BM25 (z per job),44,val,n_jobs_ranked,23.0
+SBERT cosine,44,val,macro_F1,0.2565876859283341
+SBERT cosine,44,val,MAE,21.2788783182588
+SBERT cosine,44,val,Spearman,0.16304876924921785
+SBERT cosine,44,val,ROC_AUC,0.580222647752264
+SBERT cosine,44,val,P_No Fit,0.5025041736227045
+SBERT cosine,44,val,R_No Fit,0.9435736677115988
+SBERT cosine,44,val,F1_No Fit,0.6557734204793029
+SBERT cosine,44,val,P_Potential Fit,0.0
+SBERT cosine,44,val,R_Potential Fit,0.0
+SBERT cosine,44,val,F1_Potential Fit,0.0
+SBERT cosine,44,val,P_Good Fit,0.2972972972972973
+SBERT cosine,44,val,R_Good Fit,0.07051282051282051
+SBERT cosine,44,val,F1_Good Fit,0.11398963730569948
+SBERT cosine,44,val,Spearman_per_job,0.2871337670926925
+SBERT cosine,44,val,NDCG@5,0.7406616206706161
+SBERT cosine,44,val,MRR,0.8833333333333334
+SBERT cosine,44,val,n_jobs_ranked,23.0
+Majority / mean,44,test,macro_F1,0.22292103424178897
+Majority / mean,44,test,MAE,22.527986844237063
+Majority / mean,44,test,Spearman,
+Majority / mean,44,test,ROC_AUC,0.5
+Majority / mean,44,test,P_No Fit,0.5023622047244094
+Majority / mean,44,test,R_No Fit,1.0
+Majority / mean,44,test,F1_No Fit,0.6687631027253669
+Majority / mean,44,test,P_Potential Fit,0.0
+Majority / mean,44,test,R_Potential Fit,0.0
+Majority / mean,44,test,F1_Potential Fit,0.0
+Majority / mean,44,test,P_Good Fit,0.0
+Majority / mean,44,test,R_Good Fit,0.0
+Majority / mean,44,test,F1_Good Fit,0.0
+Majority / mean,44,test,Spearman_per_job,
+Majority / mean,44,test,NDCG@5,0.5427219317860582
+Majority / mean,44,test,MRR,0.6666666666666666
+Majority / mean,44,test,n_jobs_ranked,21.0
+Resume prior (no job),44,test,macro_F1,0.42142082901698613
+Resume prior (no job),44,test,MAE,20.811995410866984
+Resume prior (no job),44,test,Spearman,0.22384031458383663
+Resume prior (no job),44,test,ROC_AUC,0.6410633653872042
+Resume prior (no job),44,test,P_No Fit,0.5907079646017699
+Resume prior (no job),44,test,R_No Fit,0.8369905956112853
+Resume prior (no job),44,test,F1_No Fit,0.6926070038910506
+Resume prior (no job),44,test,P_Potential Fit,0.3706896551724138
+Resume prior (no job),44,test,R_Potential Fit,0.27388535031847133
+Resume prior (no job),44,test,F1_Potential Fit,0.315018315018315
+Resume prior (no job),44,test,P_Good Fit,0.43283582089552236
+Resume prior (no job),44,test,R_Good Fit,0.18238993710691823
+Resume prior (no job),44,test,F1_Good Fit,0.25663716814159293
+Resume prior (no job),44,test,Spearman_per_job,0.1294219426154818
+Resume prior (no job),44,test,NDCG@5,0.6444870233998363
+Resume prior (no job),44,test,MRR,0.7424242424242423
+Resume prior (no job),44,test,n_jobs_ranked,21.0
+BM25 (raw),44,test,macro_F1,0.22198879551820727
+BM25 (raw),44,test,MAE,22.755114196305072
+BM25 (raw),44,test,Spearman,-0.10710822284559299
+BM25 (raw),44,test,ROC_AUC,0.4383632172504664
+BM25 (raw),44,test,P_No Fit,0.5007898894154819
+BM25 (raw),44,test,R_No Fit,0.9937304075235109
+BM25 (raw),44,test,F1_No Fit,0.6659663865546218
+BM25 (raw),44,test,P_Potential Fit,0.0
+BM25 (raw),44,test,R_Potential Fit,0.0
+BM25 (raw),44,test,F1_Potential Fit,0.0
+BM25 (raw),44,test,P_Good Fit,0.0
+BM25 (raw),44,test,R_Good Fit,0.0
+BM25 (raw),44,test,F1_Good Fit,0.0
+BM25 (raw),44,test,Spearman_per_job,0.17041294309373953
+BM25 (raw),44,test,NDCG@5,0.5571214511294262
+BM25 (raw),44,test,MRR,0.606060606060606
+BM25 (raw),44,test,n_jobs_ranked,21.0
+BM25 (z per job),44,test,macro_F1,0.23042739983380903
+BM25 (z per job),44,test,MAE,21.673877683041468
+BM25 (z per job),44,test,Spearman,0.1941931391421181
+BM25 (z per job),44,test,ROC_AUC,0.5885733975163
+BM25 (z per job),44,test,P_No Fit,0.50814332247557
+BM25 (z per job),44,test,R_No Fit,0.9780564263322884
+BM25 (z per job),44,test,F1_No Fit,0.6688102893890675
+BM25 (z per job),44,test,P_Potential Fit,0.09523809523809523
+BM25 (z per job),44,test,R_Potential Fit,0.012738853503184714
+BM25 (z per job),44,test,F1_Potential Fit,0.02247191011235955
+BM25 (z per job),44,test,P_Good Fit,0.0
+BM25 (z per job),44,test,R_Good Fit,0.0
+BM25 (z per job),44,test,F1_Good Fit,0.0
+BM25 (z per job),44,test,Spearman_per_job,0.14546193184288608
+BM25 (z per job),44,test,NDCG@5,0.6952740743306273
+BM25 (z per job),44,test,MRR,0.7727272727272727
+BM25 (z per job),44,test,n_jobs_ranked,21.0
+SBERT cosine,44,test,macro_F1,0.3463442783144566
+SBERT cosine,44,test,MAE,21.250484278641345
+SBERT cosine,44,test,Spearman,0.2848856352028184
+SBERT cosine,44,test,ROC_AUC,0.6369770841285733
+SBERT cosine,44,test,P_No Fit,0.5670731707317073
+SBERT cosine,44,test,R_No Fit,0.8746081504702194
+SBERT cosine,44,test,F1_No Fit,0.688039457459926
+SBERT cosine,44,test,P_Potential Fit,0.0
+SBERT cosine,44,test,R_Potential Fit,0.0
+SBERT cosine,44,test,F1_Potential Fit,0.0
+SBERT cosine,44,test,P_Good Fit,0.3706293706293706
+SBERT cosine,44,test,R_Good Fit,0.3333333333333333
+SBERT cosine,44,test,F1_Good Fit,0.3509933774834437
+SBERT cosine,44,test,Spearman_per_job,0.3450326176292195
+SBERT cosine,44,test,NDCG@5,0.7575886950370068
+SBERT cosine,44,test,MRR,0.7424242424242423
+SBERT cosine,44,test,n_jobs_ranked,21.0
