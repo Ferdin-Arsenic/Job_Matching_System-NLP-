@@ -1,27 +1,19 @@
 """Task 3: profil STUB untuk 778 resume ATS (dipakai ablation V3 sampai model Task 2 jadi). Hasil wajib ditandai "(stub)".
 - sub_field: TF-IDF + LogReg dilatih di ResumeAtlas (beda dataset dari ATS, jadi tidak bocor ke test Task 3).
-- field: FIELD_MAP dari notebooks/cv_job_matching_all.ipynb (asumsi tim, belum dibekukan Task 2).
+- field: FIELD_MAP dari task2_cls/field_map.py.
 - level: dari experience_years Task 1 (<2 Entry, 2-5 Mid, >5 Senior, kosong = Unknown), aturan CLAUDE.md bagian 3.
 Jalankan dari root repo:  python task3_match/profile_stub.py   -> data/cache/profiles_stub.parquet
 """
-import re, sys
+import sys
+from pathlib import Path
 import numpy as np, pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
-from common import DATA, ROOT, load
-
-FIELD_MAP = {
-    **{k: "IT" for k in ["Java Developer", "Python Developer", "DotNet Developer", "SQL Developer", "SAP Developer", "ETL Developer", "React Developer",
-                         "Web Designing", "Database", "DevOps", "Testing", "Network Security Engineer", "Data Science", "Blockchain", "Information Technology"]},
-    **{k: "Engineering & Construction" for k in ["Electrical Engineering", "Mechanical Engineer", "Civil Engineer", "Building and Construction", "Architecture", "Automobile"]},
-    **{k: "Finance" for k in ["Accountant", "Finance", "Banking"]},
-    **{k: "Business & Management" for k in ["Business Analyst", "Consultant", "Management", "Operations Manager", "PMO", "Sales", "Human Resources", "BPO", "Advocate"]},
-    **{k: "Creative & Media" for k in ["Designing", "Digital Media", "Arts", "Apparel", "Public Relations"]},
-    **{k: "Education & Health" for k in ["Education", "Health and Fitness"]},
-    **{k: "Services & Industry" for k in ["Food and Beverages", "Aviation", "Agriculture"]}}
-norm = lambda s: re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", (s or "").lower())).strip()   # gaya teks ResumeAtlas
-level = lambda y: "Unknown" if pd.isna(y) else "Entry" if y < 2 else "Mid" if y <= 5 else "Senior"
+# Support both direct script execution and package imports from the repo root.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from task3_match.common import DATA, ROOT, load
+from task2_cls.field_map import FIELD_MAP
+from task2_cls.preprocessing import normalize_like_resumeatlas as norm, level_from_years as level
 
 if __name__ == "__main__":
     from datasets import load_dataset
