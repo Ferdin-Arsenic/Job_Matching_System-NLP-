@@ -1,25 +1,19 @@
-"""Task 3 proposed: Cross-Encoder JobBERT (jjzha/jobbert-base-cased). BUTUH GPU (Colab T4) untuk run penuh.
+"""Cross-Encoder JobBERT (jjzha/jobbert-base-cased). BUTUH GPU (Colab T4) untuk run penuh.
 
 Input pasangan: [CLS] job [SEP] resume [SEP], anggaran job <= 190 + resume <= 319 wordpiece (+3 special = 512).
 Varian ablation (split, hyperparameter, seed sama):
   V1 = raw text | V2 = entity Task 1 di depan raw text | V3 = V2 + profil Task 2 di depan resume
 Dua run terpisah: reg (num_labels=1, target ats/100, MSE) dan cls (num_labels=3, cross-entropy).
-
-Contoh (dari root repo):
-  python task3_match/cross_encoder.py --variant V1 --run cls --lr 2e-5
-  python task3_match/cross_encoder.py --variant V1 --run cls --sample 32 --epochs 1 --backbone google/bert_uncased_L-2_H-128_A-2   # smoke test CPU
-Hasil: data/results/task3_ce_<tag>.csv (metrik val+test), data/results/task3_pred_<tag>.parquet, models/match/<tag>/
 """
 import argparse, shutil, sys
 from pathlib import Path
-import numpy as np, pandas as pd, torch
+import numpy as np, pandas as pd
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score
-from transformers import (AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding,
-                          EarlyStoppingCallback, Trainer, TrainingArguments, set_seed)
-sys.path.insert(0, str(Path(__file__).parent))
-from common import DATA, ROOT, evaluate, get_splits, load
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from task3_match.common import DATA, ROOT, evaluate, get_splits, load
+from common.schemas import validate_profile
 
 BACKBONE, JOB_B, RES_B, SEED = "jjzha/jobbert-base-cased", 190, 319, 42
 ENT = [("SKILL", "skills"), ("JOB_TITLE", "titles"), ("EDUCATION", "education"), ("EXPERIENCE", "experience")]
@@ -29,7 +23,7 @@ def ent_str(row):
     return " | ".join(f"{name}: {', '.join(row[c])}" for c, name in ENT if len(row[c]))
 
 
-def build_texts(df, variant):
+def build_texts(df, variant, profiles="profiles_stub.parquet"):
     """Teks segmen job & resume per varian. Entity/profil di depan supaya tidak terpotong; raw text mengisi sisa anggaran."""
     job, res = df.job.tolist(), df.resume.tolist()
     if variant == "V1": return job, res
@@ -39,7 +33,14 @@ def build_texts(df, variant):
     job = [f"{je[j]} || {t}" for j, t in zip(df.job_id, job)]
     pre = re_.reindex(df.resume_id).values
     if variant == "V3":
-        p = pd.read_parquet(DATA / "cache" / PROFILES).set_index("resume_id").reindex(df.resume_id)
+        p = pd.read_parquet(DATA / "cache" / profiles)
+        if not {"resume_id", "field", "sub_field", "level"} <= set(p) or p.resume_id.duplicated().any():
+            raise ValueError("Profiles need complete columns and unique resume_id")
+        if not set(df.resume_id) <= set(p.resume_id):
+            raise ValueError("Missing Task 2 profiles for matching resumes")
+        for row in p.to_dict("records"):
+            validate_profile({**row, "field_probs": {}, "sub_probs": {}})
+        p = p.set_index("resume_id").reindex(df.resume_id)
         pre = [f"field: {f} | sub-field: {s} | level: {l} | {e}" for f, s, l, e in zip(p.field, p.sub_field, p.level, pre)]
     return job, [f"{e} || {t}" for e, t in zip(pre, res)]
 
@@ -68,6 +69,9 @@ def metrics_fn(run):
 
 
 if __name__ == "__main__":
+    import torch
+    from transformers import (AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding,
+                              EarlyStoppingCallback, Trainer, TrainingArguments, set_seed)
     ap = argparse.ArgumentParser()
     ap.add_argument("--variant", choices=["V1", "V2", "V3"], required=True)
     ap.add_argument("--run", choices=["reg", "cls"], required=True)
@@ -79,7 +83,6 @@ if __name__ == "__main__":
     ap.add_argument("--no-save", action="store_true")
     ap.add_argument("--backbone", default=BACKBONE, help="hanya untuk smoke test CPU, mis. google/bert_uncased_L-2_H-128_A-2")
     a = ap.parse_args()
-    PROFILES = a.profiles
     stub = a.variant == "V3" and "stub" in a.profiles
     tag = f"{a.variant}{'-stub' if stub else ''}_{a.run}_lr{a.lr:g}" + (f"_sample{a.sample}" if a.sample else "")
     set_seed(SEED)
@@ -87,7 +90,7 @@ if __name__ == "__main__":
     df = load(); sp = get_splits(df)[SEED]
     idx = {k: np.array(v[:a.sample] if a.sample else v) for k, v in sp.items()}
     tk = AutoTokenizer.from_pretrained(BACKBONE)   # tokenizer selalu JobBERT (vocab 28996 muat di model tiny 30522)
-    job, res = build_texts(df, a.variant)
+    job, res = build_texts(df, a.variant, profiles=a.profiles)
     y = (df.ats_score / 100).astype("float32").tolist() if a.run == "reg" else df.tier.tolist()
     ds = {k: encode(tk, [job[i] for i in v], [res[i] for i in v], [y[i] for i in v]) for k, v in idx.items()}
     print(tag, {k: len(v) for k, v in ds.items()}, "| contoh input:", tk.decode(ds["train"][0]["input_ids"])[:400])
