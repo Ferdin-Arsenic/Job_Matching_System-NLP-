@@ -5,6 +5,8 @@ pandas
 numpy
 scipy
 scikit-learn
+joblib
+threadpoolctl
 sklearn-crfsuite
 nltk
 transformers
