@@ -9,7 +9,7 @@ from task2_cls.baselines import load_model
 from task2_cls.evaluate import OUTPUT_LABELS, predictions_from_probs
 from task2_cls.field_map import FIELD_MAP
 from task2_cls.preprocessing import (
-    PREPROCESSING_VERSION, ner_level_from_entities, normalize_like_resumeatlas,
+    PREPROCESSING_VERSION, entities_to_text, ner_level_from_entities, normalize_like_resumeatlas,
 )
 
 DEFAULT_MODELS = Path(__file__).resolve().parents[1] / "models/cls/baselines"
@@ -29,7 +29,15 @@ class Task2Classifier:
                     raise ValueError("Selection must use a consistent trained baseline")
                 model_dir = DEFAULT_MODELS / selected
             self.model_dir = Path(model_dir).resolve()
-            self.model = load_model(self.model_dir)
+            model_metadata = json.loads((self.model_dir / "metadata.json").read_text(encoding="utf-8")) if (self.model_dir / "metadata.json").exists() else {}
+            is_jobbert = model_metadata.get("architecture") == "jobbert_multi_output"
+            if is_jobbert:
+                if model_metadata.get("status") != "trained":
+                    raise ValueError("API requires a full trained checkpoint; smoke/sample experiments are excluded")
+                from task2_cls.model import JobBertPredictor
+                self.model = JobBertPredictor(self.model_dir)
+            else:
+                self.model = load_model(self.model_dir)
         except FileNotFoundError:
             if not allow_fallback:
                 raise FileNotFoundError("Task 2 artifact missing; train baselines first or explicitly set allow_fallback=True") from None
@@ -41,17 +49,28 @@ class Task2Classifier:
                 raise ValueError("Model labels differ from runtime labels")
         self.metadata = {
             "status": "trained" if self.model else "fallback (untrained)",
-            "model": self.model.mode if self.model else "fixed-information-technology",
-            "model_sha256": hashlib.sha256((self.model_dir / "model.joblib").read_bytes()).hexdigest() if self.model else None,
+            "model": ("jobbert_multi_output" if is_jobbert else self.model.mode) if self.model else "fixed-information-technology",
+            "model_sha256": self._artifact_digest() if self.model else None,
             "preprocessing_version": PREPROCESSING_VERSION,
             "level_source": level_source,
             "missing_experience": "model predicts without NER evidence" if level_source == "model" else "Unknown",
-            "input": "full_cv_text",
+            "input": self.model.metadata.get("input_mode", "full_text") if self.model else "full_text",
             "dataset_fingerprint": self.model.metadata.get("dataset_fingerprint") if self.model else None,
             "field_probability_policy": "one-hot derived from top Sub-field" if self.model and self.model.mode == "derived_field" else "model",
             "implementation_sha256": {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
-                                      for name in ("api.py", "baselines.py", "preprocessing.py", "field_map.py", "evaluate.py")},
+                                      for name in ("api.py", "baselines.py", "model.py", "preprocessing.py", "field_map.py", "evaluate.py")},
         }
+
+    def _artifact_digest(self):
+        files = [self.model_dir / "model.joblib"] if (self.model_dir / "model.joblib").exists() else sorted(
+            p for p in self.model_dir.rglob("*") if p.is_file() and (p.suffix == ".json" or p.name == "weights.pt"))
+        digest = hashlib.sha256()
+        for path in files:
+            digest.update(path.relative_to(self.model_dir).as_posix().encode())
+            with path.open("rb") as stream:
+                for block in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(block)
+        return digest.hexdigest()
 
     def classify_many(self, texts, entities=None):
         if isinstance(texts, str) or not texts or any(not isinstance(t, str) or not normalize_like_resumeatlas(t) for t in texts):
@@ -60,7 +79,12 @@ class Task2Classifier:
             entities = [None] * len(texts)
         if len(entities) != len(texts):
             raise ValueError("One entity record per CV is required")
-        probs = self.model.predict_proba(texts) if self.model else None
+        inputs = texts
+        if self.metadata["input"] == "entity_only":
+            if any(entity is None for entity in entities):
+                raise ValueError("Entity-only checkpoint requires Task 1 entities for every CV")
+            inputs = [entities_to_text(entity) for entity in entities]
+        probs = self.model.predict_proba(inputs) if self.model else None
         predictions = predictions_from_probs(probs) if probs else None
         profiles = []
         for i, entity in enumerate(entities):
