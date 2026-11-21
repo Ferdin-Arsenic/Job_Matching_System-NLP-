@@ -1,0 +1,13 @@
+model,output,C,split,metric,value
+tfidf_lr,field,0.1,val,macro_f1,0.7954106187729522
+tfidf_lr,field,1.0,val,macro_f1,0.85003479891982
+tfidf_lr,field,10.0,val,macro_f1,0.8696549445285363
+tfidf_lr,sub_field,0.1,val,macro_f1,0.7027628323854642
+tfidf_lr,sub_field,1.0,val,macro_f1,0.7976642061796675
+tfidf_lr,sub_field,10.0,val,macro_f1,0.8239274490317418
+tfidf_lr,level,0.1,val,macro_f1,0.6416483677353243
+tfidf_lr,level,1.0,val,macro_f1,0.703605786884042
+tfidf_lr,level,10.0,val,macro_f1,0.7259572072072071
+hierarchical,sub_field,0.1,val,macro_f1,0.7272602382047403
+hierarchical,sub_field,1.0,val,macro_f1,0.7849817771312878
+hierarchical,sub_field,10.0,val,macro_f1,0.8007545493070808
