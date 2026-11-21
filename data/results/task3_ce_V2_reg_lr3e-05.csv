@@ -1,0 +1,37 @@
+model,variant,run,lr,best_ckpt,profiles,split,metric,value
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,macro_F1,0.3758648129201794
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,MAE,18.77587127829724
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,Spearman,0.38068416555354523
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,ROC_AUC,0.6965685739892035
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,P_No Fit,0.6025369978858351
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,R_No Fit,0.890625
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,F1_No Fit,0.7187894073139974
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,P_Potential Fit,0.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,R_Potential Fit,0.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,F1_Potential Fit,0.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,P_Good Fit,0.4012345679012346
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,R_Good Fit,0.4166666666666667
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,F1_Good Fit,0.4088050314465409
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,Spearman_per_job,0.3219439535820776
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,NDCG@5,0.7134120578464622
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,MRR,0.7076923076923076
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,n_jobs_ranked,22.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,val,macro_F1_threshold,0.3525911031824975
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,macro_F1,0.3684793171927156
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,MAE,19.65286385885099
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,Spearman,0.3525704406232774
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,ROC_AUC,0.67650084275233
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,P_No Fit,0.5932914046121593
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,R_No Fit,0.8628048780487805
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,F1_No Fit,0.7031055900621118
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,P_Potential Fit,0.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,R_Potential Fit,0.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,F1_Potential Fit,0.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,P_Good Fit,0.3854748603351955
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,R_Good Fit,0.42073170731707316
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,F1_Good Fit,0.40233236151603496
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,Spearman_per_job,0.27148932239644663
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,NDCG@5,0.653023471716223
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,MRR,0.95
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,n_jobs_ranked,23.0
+Cross-Encoder V2 reg,V2,reg,3e-05,checkpoint-636,,test,macro_F1_threshold,0.3096712128970194

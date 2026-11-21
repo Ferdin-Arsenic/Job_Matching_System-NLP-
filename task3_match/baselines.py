@@ -7,8 +7,8 @@ import numpy as np, pandas as pd
 from rank_bm25 import BM25Okapi
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
-from common import DATA, SEEDS, evaluate, get_splits, load
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parents[1]))   # impor berawalan task3_match. agar tidak bentrok dengan paket common/
+from task3_match.common import DATA, SEEDS, evaluate, get_splits, load
 
 SBERT = "sentence-transformers/all-MiniLM-L6-v2"
 tok = lambda s: re.findall(r"\w+", s.lower())
@@ -70,7 +70,8 @@ if __name__ == "__main__":
             pri = g.tier.value_counts(normalize=True).unstack(fill_value=0).reindex(columns=[0, 1, 2], fill_value=0)
             pr = pri.reindex(d.resume_id).fillna(pd.Series(maj[0], index=[0, 1, 2])).values
             res["Resume prior (no job)"] = evaluate(d, pr, g.ats_score.mean().reindex(d.resume_id).fillna(df.ats_score.values[tr].mean()).values)
-            for name, raw in feats.items(): res[name] = evaluate(d, *calibrate(raw, df, tr, tgt))
+            for name, raw in feats.items():
+                pr, sc = calibrate(raw, df, tr, tgt); res[name] = evaluate(d, pr, sc, rank_score=raw[tgt])   # ranking: skor mentah (kontinu)
             rows += [dict(model=m, seed=seed, split=part, metric=k, value=v) for m, r in res.items() for k, v in r.items()]
     out = pd.DataFrame(rows); out.to_csv(DATA / "results" / "task3_baselines.csv", index=False)
     t = out[out.split == "test"].pivot_table(index="model", columns="metric", values="value", aggfunc=["mean", "std"])

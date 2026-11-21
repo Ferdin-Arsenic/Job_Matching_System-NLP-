@@ -43,8 +43,11 @@ def get_splits(df):
     return {int(s): v for s, v in json.loads(p.read_text()).items()}
 
 
-def evaluate(df, tier_probs, score):
-    """df = baris split yang dievaluasi; tier_probs (n,3); score = skor ATS 0-100. Mengembalikan dict metrik."""
+def evaluate(df, tier_probs, score, rank_score=None):
+    """df = baris split yang dievaluasi; tier_probs (n,3); score = skor ATS 0-100 (MAE, Spearman).
+    rank_score = skor KONTINU untuk metrik per job (NDCG, MRR, Spearman per job); default = score.
+    Skor isotonic berbentuk tangga (banyak nilai kembar), jadi urutannya bergantung urutan baris: beri rank_score yang kontinu."""
+    rs = score if rank_score is None else rank_score
     y, pred = df.tier.values, tier_probs.argmax(1)
     out = {"macro_F1": f1_score(y, pred, average="macro"), "MAE": mean_absolute_error(df.ats_score, score),
            "Spearman": spearmanr(df.ats_score, score)[0]}
@@ -53,7 +56,7 @@ def evaluate(df, tier_probs, score):
     p, r, f, _ = precision_recall_fscore_support(y, pred, labels=[0, 1, 2], zero_division=0)
     for i, t in enumerate(TIERS): out.update({f"P_{t}": p[i], f"R_{t}": r[i], f"F1_{t}": f[i]})
     sp, nd, rr = [], [], []
-    for _, g in df.assign(s=score).groupby("job_id"):
+    for _, g in df.assign(s=rs).groupby("job_id"):
         if len(g) < 3: continue                                       # ranking hanya untuk job dengan >= 3 resume
         g = g.sort_values("s", ascending=False)
         rel = g.tier.values
