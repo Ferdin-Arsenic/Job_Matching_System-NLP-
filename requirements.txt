@@ -9,8 +9,15 @@ joblib
 threadpoolctl
 sklearn-crfsuite
 nltk
-transformers
-torch
+transformers>=4.46,<6
+torch>=2.6
 matplotlib
 seaborn
 wordcloud
+huggingface_hub
+safetensors
+sentence-transformers
+rank_bm25
+pdfplumber
+pypdf
+fpdf2  # only for scripts/make_examples.py
