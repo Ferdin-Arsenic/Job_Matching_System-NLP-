@@ -2,10 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 import re
 import sys
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from t1_ner_predict import ENTITIES, extract, load  # noqa: E402
-
+from scripts.t1_ner_predict import ENTITIES, extract, load
 from common.schemas import adapt_task1_entities  # noqa: E402
 
 FUNC = {"to", "of", "in", "and", "or", "the", "a", "an", "for", "with", "at", "from", "since", "till", "until",
