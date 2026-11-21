@@ -1,0 +1,11 @@
+arah,true,pred_tier,p_pred,job_title,req_years,resume_title,field,level,cv_years,skill_overlap
+terlalu tinggi,No Fit,Good Fit,0.879816,"senior manager , data architecture data engineering",,sql server developer,IT,Unknown,,0
+terlalu tinggi,Potential Fit,Good Fit,0.86778563,full stack engineer,5.0,"developerrapid, teaching assistantpurdue",IT,Unknown,,0
+terlalu tinggi,Potential Fit,Good Fit,0.8651026,"title accountant, accountant",10.0,"fund accountant, accountants",Finance,Unknown,,0
+terlalu tinggi,Potential Fit,Good Fit,0.86023283,"title accountant, accountant",10.0,"international tax accountant, tax accountantcoca-cola, tax internmidwest",Finance,Unknown,,1
+terlalu tinggi,Potential Fit,Good Fit,0.8514368,"title accountant, accountant",10.0,"accountant, experiencestaff accountant, ap specialist ( consultant )",Finance,Unknown,,1
+terlalu rendah,Potential Fit,No Fit,0.98607033,data engineer,8.0,"data assistant, residential specialist, business credit manager",Business & Management,Unknown,,0
+terlalu rendah,Potential Fit,No Fit,0.9645474,"software engineerlocation, software engineer",,"developer, developerwithin3, engineerbaroda electrical",IT,Mid,3.0,2
+terlalu rendah,Potential Fit,No Fit,0.960005,"fullstack java engineerjob, fullstack java engineer",8.0,test analyst,IT,Senior,8.0,0
+terlalu rendah,Good Fit,No Fit,0.94574064,data engineer,8.0,"adherence technician, pharmacy techniciandavidson, nursing assistant",Business & Management,Unknown,,0
+terlalu rendah,Good Fit,No Fit,0.9360172,data engineer,8.0,"qa analyst software quality assurance specialist, it professional, quality data coordinator",IT,Senior,12.0,1
