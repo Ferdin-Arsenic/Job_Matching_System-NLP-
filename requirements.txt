@@ -1,23 +1,25 @@
-kagglehub
-datasets
-pyarrow
-pandas
-numpy
-scipy
-scikit-learn
-joblib
-threadpoolctl
-sklearn-crfsuite
-nltk
-transformers>=4.46,<6
-torch>=2.6
-matplotlib
-seaborn
-wordcloud
-huggingface_hub
-safetensors
-sentence-transformers
-rank_bm25
-pdfplumber
-pypdf
-fpdf2  # only for scripts/make_examples.py
+# Versions below are the ones the results and the demo were produced with (Python 3.12, Windows, CPU torch).
+kagglehub==1.0.2
+datasets==5.0.0
+pyarrow==24.0.0
+pandas==3.0.1
+numpy==2.4.3
+scipy==1.16.3
+scikit-learn==1.9.1
+joblib==1.5.2
+threadpoolctl==3.6.0
+sklearn-crfsuite==0.5.0
+nltk==3.9.4
+transformers==5.17.0
+torch==2.12.1
+accelerate==1.15.0           # only for fine-tuning with the Trainer (Colab)
+sentence-transformers==6.3.0
+rank_bm25==0.2.2
+matplotlib==3.11.2
+seaborn==0.13.2
+wordcloud==1.9.6
+huggingface_hub==1.20.1
+safetensors==0.8.0
+pdfplumber==0.11.10
+pypdf==6.19.0
+fpdf2==2.9.0                 # only for scripts/make_examples.py

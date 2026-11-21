@@ -1,0 +1,16 @@
+Backend Software Engineer
+
+We are looking for a Backend Software Engineer to build and maintain the services behind our logistics platform.
+
+Responsibilities
+- Design, build and maintain REST APIs and background workers in Python.
+- Model data and write efficient queries in PostgreSQL.
+- Package and deploy services with Docker on AWS; maintain CI/CD pipelines.
+- Write unit and integration tests, review code, and take part in an Agile team.
+
+Requirements
+- 3+ years of professional experience with Python (Django or Flask).
+- Strong knowledge of REST API design and relational databases (PostgreSQL).
+- Experience with Docker, Git and AWS, plus CI/CD tools.
+- Bachelor's degree in Computer Science or a related field.
+- Good communication skills and a habit of writing clear documentation.
