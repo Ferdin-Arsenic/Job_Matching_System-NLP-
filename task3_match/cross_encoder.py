@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ap.add_argument("--backbone", default=BACKBONE, help="hanya untuk smoke test CPU, mis. google/bert_uncased_L-2_H-128_A-2")
     a = ap.parse_args()
     stub = a.variant == "V3" and "stub" in a.profiles
-    tag = f"{a.variant}{'-stub' if stub else ''}_{a.run}_lr{a.lr:g}" + (f"_sample{a.sample}" if a.sample else "")
+    tag = f"{a.variant}{'-stub' if stub else ''}{'-jbprof' if a.variant == 'V3' and 'jobbert' in a.profiles else ''}_{a.run}_lr{a.lr:g}" + (f"_sample{a.sample}" if a.sample else "")
     set_seed(SEED)
 
     df = load(); sp = get_splits(df)[SEED]
