@@ -7,8 +7,8 @@ import numpy as np, pandas as pd
 from rank_bm25 import BM25Okapi
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
-from common import DATA, SEEDS, evaluate, get_splits, load
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parents[1]))   # impor berawalan task3_match. agar tidak bentrok dengan paket common/
+from task3_match.common import DATA, SEEDS, evaluate, get_splits, load
 
 SBERT = "sentence-transformers/all-MiniLM-L6-v2"
 tok = lambda s: re.findall(r"\w+", s.lower())
