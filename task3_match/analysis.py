@@ -8,9 +8,9 @@ from pathlib import Path
 import numpy as np, pandas as pd
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-sys.path.insert(0, str(Path(__file__).parent))
-from common import DATA, ROOT, TIERS, evaluate, get_splits, load
-from baselines import calibrate, sbert_raw
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from task3_match.common import DATA, ROOT, TIERS, evaluate, get_splits, load
+from task3_match.baselines import calibrate, sbert_raw
 
 SEED, DRAWS, LR = 42, 1000, "2e-05"
 RES, FIG = DATA / "results", ROOT / "figures"; FIG.mkdir(exist_ok=True)
