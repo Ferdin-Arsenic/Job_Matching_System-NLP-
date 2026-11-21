@@ -4,8 +4,9 @@ Model: Cross-Encoder V3 (jjzha/jobbert-base-cased fine-tuned, 3-class) = raw tex
 the best ablation variant in task3_match/analysis.py. The input is built by the SAME functions as training
 (task3_match/cross_encoder.py), so CLI inputs match what the model saw.
 
-Weights: models/match/V3_cls_lr2e-05/ (Colab output, not in git). If missing, they are downloaded from the
-Hugging Face repo in env T3_MATCH_REPO; with neither, a clear error is raised (no silent fallback).
+Weights: models/match/V3_cls_lr2e-05/ (not in git). If missing, they are downloaded once from the public Hugging Face
+repo Arxenarendra/jobbert-task3-match (override with env T3_MATCH_REPO); if that fails, a clear error is raised
+(no silent fallback).
 
 score = isotonic(E[tier]) fitted on the VAL rows of the training run (same as training), tier = argmax of the
 softmax probabilities. rank() orders by E[tier], which is continuous; the isotonic score is a step function with many ties.
@@ -24,18 +25,19 @@ from task3_match.cross_encoder import encode, ent_str
 
 TAG = "V3_cls_lr2e-05"
 MODEL_DIR = ROOT / "models" / "match" / TAG
-HF_REPO = os.environ.get("T3_MATCH_REPO")
+HF_REPO = os.environ.get("T3_MATCH_REPO", "Arxenarendra/jobbert-task3-match")
 MODEL_NAME = "Cross-Encoder V3 (JobBERT; raw text + Task 1 entities + Task 2 profile)"
 BATCH = 8
 
 
 def _model_dir() -> Path:
     if not (MODEL_DIR / "model.safetensors").exists():
-        if not HF_REPO:
-            raise FileNotFoundError(f"Task 3 weights missing: {MODEL_DIR}. Copy the folder from the Colab output "
-                                    "(MyDrive/task3_match/models/V3_cls_lr2e-05) or set T3_MATCH_REPO to a Hugging Face repo.")
         from huggingface_hub import snapshot_download
-        snapshot_download(HF_REPO, local_dir=MODEL_DIR, allow_patterns=["*.json", "*.safetensors"])
+        try:
+            snapshot_download(HF_REPO, local_dir=MODEL_DIR, allow_patterns=["*.json", "*.safetensors"])
+        except Exception as exc:  # noqa: BLE001 - offline or repo unavailable
+            raise FileNotFoundError(f"Task 3 weights missing in {MODEL_DIR} and download from {HF_REPO} failed ({exc}). "
+                                    "Connect to the internet, set T3_MATCH_REPO, or copy models/match/V3_cls_lr2e-05 manually.") from exc
     return MODEL_DIR
 
 
