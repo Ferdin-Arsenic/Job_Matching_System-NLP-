@@ -123,7 +123,7 @@ if __name__ == "__main__":
         sv, st = iso.predict(ev), iso.predict(et)
     rows = []
     for part, d, pr, s in (("val", dv, prv, sv), ("test", dt, prt, st)):
-        r = evaluate(d, pr, s)
+        r = evaluate(d, pr, s, rank_score=pr @ [0, 1, 2] if a.run == "cls" else None)   # cls: E[tier] kontinu, bukan skor isotonic bertangga
         if a.run == "reg": r["macro_F1_threshold"] = f1_score(d.tier, thr[part].argmax(1), average="macro")
         rows += [dict(model=f"Cross-Encoder {a.variant}{' (stub)' if stub else ''} {a.run}", variant=a.variant, run=a.run, lr=a.lr,
                       best_ckpt=Path(tr.state.best_model_checkpoint or "").name, profiles=a.profiles if a.variant == "V3" else "",
