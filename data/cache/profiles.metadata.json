@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "classifier": {
+    "status": "trained",
+    "model": "derived_field",
+    "model_sha256": "7b6de1b82009aa44be27c79dce5ae9775f1aea11472021fbf604b40a37856f41",
+    "preprocessing_version": "resumeatlas-v1",
+    "level_source": "model",
+    "missing_experience": "model predicts without NER evidence",
+    "input": "full_cv_text",
+    "dataset_fingerprint": "9c3670f6e9d1f2b9a3b556cb2e02a003591ed091e296e7eaffadf7286a936ede",
+    "field_probability_policy": "one-hot derived from top Sub-field",
+    "implementation_sha256": {
+      "api.py": "0fdc19a11aec59852f3cae7dfab954bae7efcbb1d74658801ac60a57c502a9ec",
+      "baselines.py": "5c3e175442bdfddbdb1755a82695663517aa20a1955dcc4748dcaa5fe8e43d6d",
+      "preprocessing.py": "28e6fc16f1be7e3ed8b582eccaf749a87bdb6cef050c609b9501a023fb57fe7e",
+      "field_map.py": "82a287e248a17fd98c0fb2c1650d60166a46942e5cb7483074bbc30f0aa8fb65",
+      "evaluate.py": "52bb602fb8adc6be01c4000446cd7477d97c260c9ee7a98d7946396fc462be3c"
+    }
+  },
+  "resume_id": "MD5 original UTF-8 text",
+  "resume_ids_sha256": "4002878d11f93b6cb24cd3de0df8d98e1c0d8c36c5ac521d1ab920a3358e788c",
+  "rows": 778,
+  "pairs": 6374,
+  "ner_sha256": null,
+  "exporter_sha256": "f0210f8a91537e35ff763faddc4f51fd6e31e4ed43b1ef8c720f6b752dd8dfd9"
+}
