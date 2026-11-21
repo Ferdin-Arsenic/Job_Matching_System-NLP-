@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "classifier": {
+    "status": "trained",
+    "model": "jobbert_multi_output",
+    "model_sha256": "162a8e7e08f29ed1c361185ab16ee3014c1e32e57dc89b57f58be6c56c46bfc3",
+    "preprocessing_version": "resumeatlas-v1",
+    "level_source": "ner",
+    "missing_experience": "Unknown",
+    "input": "full_text",
+    "dataset_fingerprint": "9c3670f6e9d1f2b9a3b556cb2e02a003591ed091e296e7eaffadf7286a936ede",
+    "field_probability_policy": "one-hot derived from top Sub-field",
+    "implementation_sha256": {
+      "api.py": "bac51c5f1bb737f15de639a086d5d782d391fab632b96a31e9acb01b4885e43e",
+      "baselines.py": "308cc200423ccbf685159938122f4c15b714d7e2274b9edadf58586b8e536799",
+      "model.py": "66780a31722d659fb77e3407cdad48781388ceef1a00a066e589d8003d15cefb",
+      "preprocessing.py": "00efdea3dabddd029add6477fc3e8e317ed4daa5fbe30f2f675dd569bcb4ee69",
+      "field_map.py": "9730d2c5a56f2b52d562ea5b7d6391c6c736c296cfaa6340a32f6dd590f252a1",
+      "evaluate.py": "b4348716b621d5d0109b1d7c3232e7a138135bd60e61e4d05f684f287f57aca0"
+    }
+  },
+  "resume_id": "MD5 original UTF-8 text",
+  "resume_ids_sha256": "4002878d11f93b6cb24cd3de0df8d98e1c0d8c36c5ac521d1ab920a3358e788c",
+  "rows": 778,
+  "pairs": 6374,
+  "ner_sha256": "ba15bc218bea6893ddac425403263f71a82ff20b2bf56294ac2e3f6695a9d7af",
+  "exporter_sha256": "7778875b4daa61a355e6e8d82813bba2c6299ff684c1c4550da7ac768c90e0f5"
+}
