@@ -39,9 +39,9 @@ def export_profiles(pairs, classifier, output, *, ner=None, batch_size=64, force
         raise ValueError("Conflicting resume texts for the same ID")
     entities = None
     ner_hash = None
-    if classifier.level_source == "ner":
+    if classifier.level_source == "ner" or classifier.metadata.get("input") == "entity_only":
         if ner is None or ner.text_md5.duplicated().any():
-            raise ValueError("NER Level requires unique Task 1 records")
+            raise ValueError("NER Level/entity-only input requires unique Task 1 records")
         indexed = ner.set_index("text_md5")
         if not set(unique.resume_id) <= set(indexed.index):
             raise ValueError("Missing NER records for matching resumes")
@@ -83,7 +83,8 @@ def main():
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     classifier = Task2Classifier(args.model_dir, level_source=args.level_source)
-    ner = pd.read_parquet(ROOT / "outputs/ner/ner_ats_resume.parquet") if args.level_source == "ner" else None
+    needs_ner = args.level_source == "ner" or classifier.metadata["input"] == "entity_only"
+    ner = pd.read_parquet(ROOT / "outputs/ner/ner_ats_resume.parquet") if needs_ner else None
     result, updated = export_profiles(load(), classifier, args.output, ner=ner, batch_size=args.batch_size, force=args.force)
     print(f"{'Exported' if updated else 'Reused valid cache'}: {len(result)} unique resumes -> {args.output}")
     print("Level source:", classifier.level_source, "|", result.level.value_counts().to_dict())
