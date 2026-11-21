@@ -77,6 +77,8 @@ if __name__ == "__main__":
     ap.add_argument("--sample", type=int, default=0, help="SAMPLE_N per split untuk tes CPU (0 = penuh)")
     ap.add_argument("--profiles", default="profiles_stub.parquet", help="file di data/cache; ganti ke output Task 2 bila sudah ada")
     ap.add_argument("--no-save", action="store_true")
+    ap.add_argument("--ckpt-dir", default=str(ROOT / "models" / "match" / "_ckpt"),
+                    help="checkpoint per epoch; jika sudah ada checkpoint untuk tag ini, training dilanjutkan dari situ")
     ap.add_argument("--backbone", default=BACKBONE, help="hanya untuk smoke test CPU, mis. google/bert_uncased_L-2_H-128_A-2")
     a = ap.parse_args()
     PROFILES = a.profiles
@@ -94,7 +96,7 @@ if __name__ == "__main__":
 
     model = AutoModelForSequenceClassification.from_pretrained(a.backbone, num_labels=1 if a.run == "reg" else 3)
     steps = -(-len(ds["train"]) // a.bs) * a.epochs
-    out_dir = ROOT / "models" / "match" / "_ckpt" / tag
+    out_dir = Path(a.ckpt_dir) / tag
     args = TrainingArguments(output_dir=str(out_dir), eval_strategy="epoch", save_strategy="epoch", save_total_limit=1,
                              load_best_model_at_end=True, metric_for_best_model="mae" if a.run == "reg" else "macro_f1",
                              greater_is_better=a.run == "cls", learning_rate=a.lr, num_train_epochs=a.epochs,
@@ -102,7 +104,9 @@ if __name__ == "__main__":
                              weight_decay=0.01, fp16=torch.cuda.is_available(), seed=SEED, report_to="none", logging_steps=50)
     tr = Trainer(model=model, args=args, train_dataset=ds["train"], eval_dataset=ds["val"], data_collator=DataCollatorWithPadding(tk),
                  compute_metrics=metrics_fn(a.run), callbacks=[EarlyStoppingCallback(early_stopping_patience=1)])
-    tr.train()
+    resume = any(out_dir.glob("checkpoint-*"))
+    print("lanjut dari checkpoint di" if resume else "mulai baru, checkpoint ke", out_dir)
+    tr.train(resume_from_checkpoint=True if resume else None)
 
     # Prediksi -> (prob tier, skor 0-100). Kalibrator dilatih di val (bukan test), satu fitur.
     pv, pt = (tr.predict(ds[k]).predictions for k in ("val", "test"))
@@ -122,7 +126,7 @@ if __name__ == "__main__":
         r = evaluate(d, pr, s)
         if a.run == "reg": r["macro_F1_threshold"] = f1_score(d.tier, thr[part].argmax(1), average="macro")
         rows += [dict(model=f"Cross-Encoder {a.variant}{' (stub)' if stub else ''} {a.run}", variant=a.variant, run=a.run, lr=a.lr,
-                      best_ckpt=Path(tr.state.best_model_checkpoint or "").name,
+                      best_ckpt=Path(tr.state.best_model_checkpoint or "").name, profiles=a.profiles if a.variant == "V3" else "",
                       split=part, metric=k, value=v) for k, v in r.items()]
     (DATA / "results").mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(DATA / "results" / f"task3_ce_{tag}.csv", index=False)
