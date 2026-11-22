@@ -1,19 +1,9 @@
-"""Task 3 stacker: the cross-encoder combined with explicit match signals. Used by the demo (task3_match/api.py).
-
-Why: the cross-encoder (V3, JobBERT profiles) saturates; most CVs get E[tier] near 2 regardless of content.
-Stacker = logistic regression fitted on the VAL rows of a split seed (no BERT retraining), features:
-  l0-l2      log probabilities of the cross-encoder (stored Colab predictions)
-  skill_cov  share of the job's Task 1 SKILL tokens found in the CV's SKILL tokens
-  title_jac  token Jaccard of job vs CV JOB_TITLE entities
-  sbert      SBERT cosine job vs CV (same embedding as the SBERT baseline)
-  *_z        the three above z-scored within each job, i.e. relative to the other candidates of that job
-"CE + all" is the pre-specified design; the reduced variants were looked at afterwards and are reported for information
-only, not used to choose. Evaluated on TEST for seeds 42/43/44; paired bootstrap over jobs on seed 42.
-The seed-42 stacker (fitted on val of the split the demo cross-encoder was trained on) is saved for the demo.
-
-Output: data/results/task3_stacking_seeds.csv, task3_stacking_bootstrap.csv, data/cache/task3_stacker.json
-Run from repo root (CPU, ~3 min):  python task3_match/stacking.py
-"""
+"""Task 3 stacker: cross-encoder probabilities + explicit match signals, used by the demo (api.py).
+Logistic regression fit on the VAL rows of split seed 42 (no BERT retraining). Features: cross-encoder log-probs, skill_cov,
+title_jac, SBERT cosine, and each signal z-scored within its job. "CE + all" is the pre-specified design; reduced variants
+are for information only. Evaluated on test for seeds 42/43/44 (paired bootstrap on seed 42).
+Output: data/results/task3_stacking_{seeds,bootstrap}.csv, data/cache/task3_stacker.json
+Run from repo root: python task3_match/stacking.py (CPU, ~3 min)"""
 import json, re, sys
 from pathlib import Path
 import numpy as np, pandas as pd

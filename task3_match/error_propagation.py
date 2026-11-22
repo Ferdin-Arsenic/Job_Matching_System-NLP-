@@ -1,21 +1,8 @@
-"""Task 3 error propagation: how much do Task 1 (NER) and Task 2 (profile) errors hurt matching? CPU, test seed 42.
-
-Model = the demo's cross-encoder (V3 trained with Task 2 JobBERT profiles), before the stacker in task3_match/stacking.py. The matching dataset has no gold
-NER or gold Field for its CVs, so "predicted vs gold" is not possible. Instead the trained model stays fixed and its
-upstream input is made wrong at test time (simulated upstream errors), then the drop is measured:
-  clean        predicted entities + predicted profile (what the pipeline feeds it)
-  profile_50   for 50% of CVs, the Task 2 profile of another test CV          (Task 2 wrong for half the CVs)
-  profile_100  same for every CV
-  ent_50       for 50% of CVs and jobs, the Task 1 entities of another CV/job (Task 1 wrong for half)
-  ent_100      same for every CV and job
-  both_100     profile_100 + ent_100
-Swaps are derangements (never a CV's own value), but two CVs can share the same profile, so the share of pairs whose text
-actually changed is reported. Paired bootstrap over jobs (1000 draws) gives a 95% CI for each drop.
-Also: clean accuracy where Task 2 JobBERT and the baseline Task 2 agree vs disagree on Sub-field (disagree => at least one is wrong).
-
-Output: data/results/task3_error_propagation{,_agree}.csv, task3_error_propagation_pred.parquet (cache; delete to recompute)
-Run from repo root: python task3_match/error_propagation.py      (~15-30 min CPU for 6 x 656 pairs)
-"""
+"""Task 3 error propagation (CPU, test seed 42): how much do Task 1 / Task 2 errors hurt matching?
+The demo cross-encoder stays fixed and its upstream input is made wrong at test time (these CVs have no gold NER/Field):
+  clean | profile_50/100 (Task 2 profile swapped for 50%/100% of CVs) | ent_50/100 (Task 1 entities swapped) | both_100
+Paired bootstrap over jobs gives a 95% CI per drop.
+Output: data/results/task3_error_propagation{,_agree}.csv. Run: python task3_match/error_propagation.py (~15-30 min)"""
 import sys
 from pathlib import Path
 import numpy as np, pandas as pd, torch

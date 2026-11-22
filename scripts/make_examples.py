@@ -1,9 +1,6 @@
 """Write the demo inputs: examples/job{1,2}.txt and examples/cvs/cv{1..5}.pdf.
-
-ALL TEXT HERE IS SYNTHETIC: written for the demo, not taken from any dataset or real person, and not an evaluation
-set. The "expected" notes are the author's judgement, not ground truth.
-Run from the repo root:  python scripts/make_examples.py      (needs fpdf2)
-"""
+All text is synthetic; the "expected" notes are the author's judgement, not ground truth.
+Run from repo root: python scripts/make_examples.py (needs fpdf2)"""
 from pathlib import Path
 
 from fpdf import FPDF

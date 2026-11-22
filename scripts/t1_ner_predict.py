@@ -1,14 +1,7 @@
-"""Task 1: inference NER dengan model final JobBERT-CRF (models/ner_jobbert_crf, dilatih di notebooks/task1_ner_crf.ipynb).
-Jika folder model belum ada, model diunduh otomatis dari Hugging Face Hub (HF_REPO).
-
-Pakai sebagai modul:
-    from t1_ner_predict import load, extract
+"""Task 1 NER inference with the final JobBERT-CRF (models/ner_jobbert_crf; downloaded from the Hub if missing).
     model, tk = load()
-    extract(["teks CV atau JD ..."], model, tk)   # -> [{"SKILL": [...], ..., "experience_years": float|None}]
-
-Atau buat ulang prediksi untuk data tim (data/ner_pred_*.parquet), lalu jalankan scripts/t1_export_outputs.py:
-    python scripts/t1_ner_predict.py --export
-"""
+    extract(["CV or JD text"], model, tk)   # -> [{"SKILL": [...], ..., "experience_years": float|None}]
+Rebuild the team predictions: python scripts/t1_ner_predict.py --export, then scripts/t1_export_outputs.py"""
 import os, re, sys
 from pathlib import Path
 import numpy as np, pandas as pd, torch
@@ -16,14 +9,14 @@ from transformers import AutoConfig, AutoModel, AutoTokenizer
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR, DATA = ROOT / "models" / "ner_jobbert_crf", ROOT / "data"
-HF_REPO = os.environ.get("T1_NER_REPO", "WwzFwz/jobbert-crf-cv-jd-ner")   # repo model di Hugging Face Hub
+HF_REPO = os.environ.get("T1_NER_REPO", "WwzFwz/jobbert-crf-cv-jd-ner")   # model repo on the Hugging Face Hub
 DEV = "cuda" if torch.cuda.is_available() else "cpu"
 ENTITIES = ["SKILL", "JOB_TITLE", "EDUCATION", "EXPERIENCE"]
 TAGS = ["O"] + [f"{p}-{L}" for L in ENTITIES for p in "BI"]; NT = len(TAGS)
 TOK = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+|\w+(?:[.+#'-]\w+)*[+#]*|[^\w\s]")
 YEAR, MAX_LEN, NEG = r"(?:19|20)\d\d", 512, -1e9
 
-ALLOW = np.ones((NT, NT), bool)                                     # ALLOW[i, j]: tag i boleh diikuti tag j
+ALLOW = np.ones((NT, NT), bool)                                     # ALLOW[i, j]: tag i may be followed by tag j
 for j, t in enumerate(TAGS):
     if t.startswith("I-"): ALLOW[:, j] = [s != "O" and s[2:] == t[2:] for s in TAGS]
 START_OK = np.array([not t.startswith("I-") for t in TAGS])
@@ -42,7 +35,7 @@ class BertCRF(torch.nn.Module):
 
 
 def load(model_dir=MODEL_DIR, repo_id=HF_REPO):
-    """Muat model dari models/ner_jobbert_crf; jika belum ada, unduh dari Hugging Face Hub (repo publik, tanpa login)."""
+    """Load models/ner_jobbert_crf, or download it from the Hub (public repo, no login)."""
     model_dir = Path(model_dir)
     if not (model_dir / "model.safetensors").exists() and not (model_dir / "model.pt").exists():
         from huggingface_hub import snapshot_download
@@ -115,7 +108,7 @@ def bio_spans(tags):
 
 
 def experience_years(spans, this_year=2026):
-    """Maksimum dari durasi eksplisit ("5 years") dan total rentang tahun yang digabung ("2015 - 2018")."""
+    """Max of the explicit duration ("5 years") and the merged year ranges ("2015 - 2018")."""
     dur, iv = [], []
     for s in spans:
         for n, unit in re.findall(r"(\d{1,2})\s*\+?\s*(years?|yrs?|months?)", s):

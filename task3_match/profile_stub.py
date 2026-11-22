@@ -1,15 +1,12 @@
-"""Task 3: profil STUB untuk 778 resume ATS (dipakai ablation V3 sampai model Task 2 jadi). Hasil wajib ditandai "(stub)".
-- sub_field: TF-IDF + LogReg dilatih di ResumeAtlas (beda dataset dari ATS, jadi tidak bocor ke test Task 3).
-- field: FIELD_MAP dari task2_cls/field_map.py.
-- level: dari experience_years Task 1 (<2 Entry, 2-5 Mid, >5 Senior, kosong = Unknown), aturan CLAUDE.md bagian 3.
-Jalankan dari root repo:  python task3_match/profile_stub.py   -> data/cache/profiles_stub.parquet
-"""
+"""Task 3 stub profiles for the 778 ATS resumes (V3 ablation before the Task 2 model existed); mark results "(stub)".
+Sub-field: TF-IDF + LogReg on ResumeAtlas. Field: FIELD_MAP. Level: Task 1 experience_years (<2 Entry, 2-5 Mid, >5 Senior).
+Run from repo root: python task3_match/profile_stub.py -> data/cache/profiles_stub.parquet"""
 import sys
 from pathlib import Path
 import numpy as np, pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-# Support both direct script execution and package imports from the repo root.
+# allow running as a script
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from task3_match.common import DATA, ROOT, load
 from task2_cls.field_map import FIELD_MAP
@@ -19,7 +16,7 @@ if __name__ == "__main__":
     from datasets import load_dataset
     atlas = load_dataset("ahmedheakl/resume-atlas", split="train").to_pandas()
     assert set(atlas.Category) <= set(FIELD_MAP), set(atlas.Category) - set(FIELD_MAP)
-    vec = TfidfVectorizer(ngram_range=(1, 2), min_df=2, sublinear_tf=True, max_features=30_000)  # shortcut: 30k (bukan 100k di TASKS.md) agar muat di RAM laptop; stub saja
+    vec = TfidfVectorizer(ngram_range=(1, 2), min_df=2, sublinear_tf=True, max_features=30_000)  # shortcut: 30k features to fit laptop RAM; stub only
     clf = LogisticRegression(max_iter=1000, class_weight="balanced").fit(vec.fit_transform(atlas.Text.map(norm)), atlas.Category)
     res = load().drop_duplicates("resume_id")[["resume_id", "resume"]]
     sub = clf.predict(vec.transform(res.resume.map(norm)))

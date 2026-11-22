@@ -1,10 +1,6 @@
-"""Cross-Encoder JobBERT (jjzha/jobbert-base-cased). BUTUH GPU (Colab T4) untuk run penuh.
-
-Input pasangan: [CLS] job [SEP] resume [SEP], anggaran job <= 190 + resume <= 319 wordpiece (+3 special = 512).
-Varian ablation (split, hyperparameter, seed sama):
-  V1 = raw text | V2 = entity Task 1 di depan raw text | V3 = V2 + profil Task 2 di depan resume
-Dua run terpisah: reg (num_labels=1, target ats/100, MSE) dan cls (num_labels=3, cross-entropy).
-"""
+"""JobBERT cross-encoder for Task 3 (a full run needs a GPU, e.g. Colab T4).
+Input [CLS] job [SEP] resume [SEP], 512 tokens. Variants: V1 raw text, V2 + Task 1 entities, V3 + Task 2 profile.
+Two runs per variant: reg (MSE on ats/100) and cls (3-class cross-entropy)."""
 import argparse, shutil, sys
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -24,7 +20,7 @@ def ent_str(row):
 
 
 def build_texts(df, variant, profiles="profiles_stub.parquet"):
-    """Teks segmen job & resume per varian. Entity/profil di depan supaya tidak terpotong; raw text mengisi sisa anggaran."""
+    """Job and resume texts per variant; entities/profile go first so they are not truncated."""
     job, res = df.job.tolist(), df.resume.tolist()
     if variant == "V1": return job, res
     ner = ROOT / "outputs" / "ner"
@@ -50,7 +46,7 @@ def encode(tk, job, res, labels):
     for a, b, y in zip(job, res, labels):
         ia = tk(a, add_special_tokens=False, truncation=True, max_length=JOB_B)["input_ids"]
         ib = tk(b, add_special_tokens=False, truncation=True, max_length=RES_B)["input_ids"]
-        ids = [tk.cls_token_id, *ia, tk.sep_token_id, *ib, tk.sep_token_id]      # format pasangan BERT
+        ids = [tk.cls_token_id, *ia, tk.sep_token_id, *ib, tk.sep_token_id]      # BERT pair format
         out.append({"input_ids": ids, "token_type_ids": [0] * (len(ia) + 2) + [1] * (len(ib) + 1),
                     "attention_mask": [1] * len(ids), "labels": y})
     return out
@@ -92,7 +88,7 @@ if __name__ == "__main__":
 
     df = load(); sp = get_splits(df)[a.seed]
     idx = {k: np.array(v[:a.sample] if a.sample else v) for k, v in sp.items()}
-    tk = AutoTokenizer.from_pretrained(BACKBONE)   # tokenizer selalu JobBERT (vocab 28996 muat di model tiny 30522)
+    tk = AutoTokenizer.from_pretrained(BACKBONE)   # always the JobBERT tokenizer
     job, res = build_texts(df, a.variant, profiles=a.profiles)
     y = (df.ats_score / 100).astype("float32").tolist() if a.run == "reg" else df.tier.tolist()
     ds = {k: encode(tk, [job[i] for i in v], [res[i] for i in v], [y[i] for i in v]) for k, v in idx.items()}
@@ -112,14 +108,14 @@ if __name__ == "__main__":
     print("lanjut dari checkpoint di" if resume else "mulai baru, checkpoint ke", out_dir)
     tr.train(resume_from_checkpoint=True if resume else None)
 
-    # Prediksi -> (prob tier, skor 0-100). Kalibrator dilatih di val (bukan test), satu fitur.
+    # predictions -> (tier probs, score 0-100); calibrator fit on val
     pv, pt = (tr.predict(ds[k]).predictions for k in ("val", "test"))
     dv, dt = df.iloc[idx["val"]], df.iloc[idx["test"]]
     if a.run == "reg":
         sv, st = pv.reshape(-1) * 100, pt.reshape(-1) * 100
         lr = LogisticRegression(max_iter=1000).fit(sv[:, None], dv.tier)
         prv, prt = lr.predict_proba(sv[:, None]), lr.predict_proba(st[:, None])
-        thr = {k: np.eye(3)[tier_of(s)] for k, s in (("val", sv), ("test", st))}   # tier dari threshold band (pembanding gratis)
+        thr = {k: np.eye(3)[tier_of(s)] for k, s in (("val", sv), ("test", st))}   # tier from score bands (free baseline)
     else:
         prv, prt = (torch.tensor(p).softmax(-1).numpy() for p in (pv, pt))
         ev, et = prv @ [0, 1, 2], prt @ [0, 1, 2]
@@ -127,7 +123,7 @@ if __name__ == "__main__":
         sv, st = iso.predict(ev), iso.predict(et)
     rows = []
     for part, d, pr, s in (("val", dv, prv, sv), ("test", dt, prt, st)):
-        r = evaluate(d, pr, s, rank_score=pr @ [0, 1, 2] if a.run == "cls" else None)   # cls: E[tier] kontinu, bukan skor isotonic bertangga
+        r = evaluate(d, pr, s, rank_score=pr @ [0, 1, 2] if a.run == "cls" else None)   # cls: continuous E[tier]
         if a.run == "reg": r["macro_F1_threshold"] = f1_score(d.tier, thr[part].argmax(1), average="macro")
         rows += [dict(model=f"Cross-Encoder {a.variant}{' (stub)' if stub else ''} {a.run}", variant=a.variant, run=a.run, lr=a.lr,
                       best_ckpt=Path(tr.state.best_model_checkpoint or "").name, profiles=a.profiles if a.variant == "V3" else "",
@@ -139,5 +135,5 @@ if __name__ == "__main__":
                  ).to_parquet(DATA / "results" / f"task3_pred_{tag}.parquet", index=False)
     if not a.no_save and not a.sample:
         tr.save_model(str(ROOT / "models" / "match" / tag)); tk.save_pretrained(str(ROOT / "models" / "match" / tag))
-    shutil.rmtree(out_dir, ignore_errors=True)                     # checkpoint per epoch (+optimizer) ~2,6 GB per run
+    shutil.rmtree(out_dir, ignore_errors=True)                     # per-epoch checkpoints are ~2.6 GB per run
     print(pd.DataFrame(rows).query("split == 'test'").set_index("metric").value.round(3).to_dict())

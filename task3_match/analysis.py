@@ -1,9 +1,6 @@
-"""Task 3: bootstrap CI per job, ablation berpasangan, error analysis, chart. CPU, seed 42, model cls lr 2e-5.
-Butuh data/results/task3_pred_V{1,2,3,3-jbprof}_cls_lr2e-05.parquet (dari Colab) dan data/cache/profiles_jobbert.parquet.
-Error analysis (bagian 2-5) memakai V3-jbprof = model yang dipakai demo (task3_match/api.py).
-Jalankan dari root repo:  python task3_match/analysis.py
-Keluaran: data/results/task3_{bootstrap,bootstrap_diff,confusion,error_*}.csv, figures/t3_res_*.png
-"""
+"""Task 3 analysis: bootstrap CIs, paired ablation, error analysis, charts (CPU, seed 42).
+Needs the Colab predictions task3_pred_V*.parquet and data/cache/profiles_jobbert.parquet.
+Run from repo root: python task3_match/analysis.py"""
 import sys
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -21,11 +18,11 @@ df = load(); sp = get_splits(df)[SEED]
 tr, te = np.array(sp["train"]), np.array(sp["test"])
 d = df.iloc[te].reset_index(drop=True)
 
-# --- prediksi: tiap model -> (prob tier (n,3), skor (n,)) pada baris test ---
+# --- predictions per model on test rows ---
 P = {}
 raw = sbert_raw(df)
-P["SBERT cosine"] = (*calibrate(raw, df, tr, te), raw[te])                      # (prob, skor, skor ranking kontinu)
-g = df.iloc[tr].groupby("resume_id")                                            # baseline "tebak dari identitas resume saja"
+P["SBERT cosine"] = (*calibrate(raw, df, tr, te), raw[te])                      # (probs, score, rank score)
+g = df.iloc[tr].groupby("resume_id")                                            # baseline: guess from the CV alone
 prior = g.tier.value_counts(normalize=True).unstack(fill_value=0).reindex(columns=[0, 1, 2], fill_value=0)
 glob = np.bincount(df.tier.values[tr], minlength=3) / len(tr)
 _pp = prior.reindex(d.resume_id).fillna(pd.Series(glob, index=[0, 1, 2])).values
@@ -35,14 +32,14 @@ for v in ("V1", "V2", "V3"):
     p = pd.read_parquet(RES / f"task3_pred_{v}_cls_lr{LR}.parquet").query("split == 'test'").set_index("row").loc[te]
     pr = p[["p0", "p1", "p2"]].values; P[f"CE {v} (cls)"] = (pr, p.score.values, pr @ [0, 1, 2])   # ranking: E[tier]
 CE = [k for k in P if k.startswith("CE")]
-# V3 dgn profil Task 2 JobBERT (profiles_jobbert.parquet) = model demo; di luar CE agar label chart ablation tetap terpisah
+# V3 with JobBERT profiles = demo model (kept apart from the CE ablation labels)
 _p = pd.read_parquet(RES / f"task3_pred_V3-jbprof_cls_lr{LR}.parquet").query("split == 'test'").set_index("row").loc[te]
 _pr = _p[["p0", "p1", "p2"]].values; P["V3-jbprof (cls)"] = (_pr, _p.score.values, _pr @ [0, 1, 2])
-ERR = "V3-jbprof (cls)"                                                          # model yang dianalisis error-nya (= demo)
+ERR = "V3-jbprof (cls)"                                                          # demo model
 SHORT = {"CE V1 (cls)": "V1", "CE V2 (cls)": "V2", "CE V3 (cls)": "V3", ERR: "V3jb"}
 
 
-# --- 1. bootstrap per job (resample job; semua resume job ikut) ---
+# --- 1. bootstrap over jobs ---
 jobs = d.job_id.unique(); by_job = {j: np.where(d.job_id.values == j)[0] for j in jobs}
 rng, draws = np.random.default_rng(SEED), []
 for b in range(DRAWS):
@@ -74,21 +71,21 @@ print(f"test: {len(d)} pasangan, {len(jobs)} job | skor isotonic V3 yang bernila
 print("\n== Bootstrap 95% CI (1000 resample job)"); print(boot.pivot(index="model", columns="metric", values="point").round(3).to_string())
 print(diff.query("metric in ['macro_F1','NDCG@5','MRR']").round(3).to_string(index=False))
 
-# --- 2. konfusi, per tier ---
+# --- 2. confusion per tier ---
 pred = {m: P[m][0].argmax(1) for m in SHORT}
 for m in ("CE V1 (cls)", ERR):
     cm = pd.crosstab(pd.Categorical(d.tier, [0, 1, 2]), pd.Categorical(pred[m], [0, 1, 2]), dropna=False)
     cm.index, cm.columns = [f"true {t}" for t in TIERS], [f"pred {t}" for t in TIERS]
     cm.to_csv(RES / f"task3_confusion_{SHORT[m]}.csv"); print(f"\n== Confusion {m}\n{cm.to_string()}")
 
-# --- 3. profil, entity, seniority ---
+# --- 3. profile, entity, seniority ---
 prof = pd.read_parquet(DATA / "cache" / "profiles_jobbert.parquet").set_index("resume_id")
 ner_r = pd.read_parquet(ROOT / "outputs" / "ner" / "ner_ats_resume.parquet").set_index("text_md5")
 ner_j = pd.read_parquet(ROOT / "outputs" / "ner" / "ner_ats_job.parquet").set_index("text_md5")
 d["field"], d["level"] = prof.field.reindex(d.resume_id).values, prof.level.reindex(d.resume_id).values
 d["req_years"] = ner_j.experience_years.reindex(d.job_id).values
 d["cv_years"] = ner_r.experience_years.reindex(d.resume_id).values
-d["too_junior"] = ((d.level == "Entry") & (d.req_years >= 2)) | ((d.level == "Mid") & (d.req_years > 5))   # aturan sama dgn pipeline/run.py
+d["too_junior"] = ((d.level == "Entry") & (d.req_years >= 2)) | ((d.level == "Mid") & (d.req_years > 5))   # same rule as pipeline/run.py
 d["pred"], d["p_pred"] = pred[ERR], P[ERR][0].max(1)
 fp = d[(d.pred == 2) & (d.tier == 0)]
 sen = pd.DataFrame({"kelompok": ["semua pasangan test", "Good Fit asli", "No Fit asli", "false positive (pred Good, asli No Fit)"],
@@ -110,7 +107,7 @@ trunc = pd.DataFrame([dict(bin=b, n=len(x), mean_words=x.words.mean(), **{f"acc_
                       for b, x in d.groupby("len_bin", observed=True)])
 trunc.to_csv(RES / "task3_error_truncation.csv", index=False); print("\n== Akurasi vs panjang teks (resume+job, kata)\n" + trunc.round(3).to_string(index=False))
 
-# --- 4. 10 contoh salah (V3-jbprof, model demo): 5 prediksi terlalu tinggi + 5 terlalu rendah, yakin tertinggi ---
+# --- 4. ten confident errors: 5 too high, 5 too low ---
 def first(xs, n=3): return ", ".join(list(xs)[:n])
 ex = d[d.pred != d.tier].assign(arah=lambda x: np.where(x.pred > x.tier, "terlalu tinggi", "terlalu rendah"))
 ex = pd.concat([ex[ex.arah == a].nlargest(5, "p_pred") for a in ("terlalu tinggi", "terlalu rendah")])
@@ -172,12 +169,12 @@ ax.set_title("Skor prediksi vs asli (garis putus-putus = prediksi sempurna)", co
 fig.tight_layout(); fig.savefig(FIG / "t3_res_pred_vs_actual.png", dpi=200); plt.close(fig)
 print("\nchart ->", ", ".join(sorted(p.name for p in FIG.glob("t3_res_*.png"))))
 
-# --- 6. tabel final seed 42: baseline (hasil baselines.py) + semua run cross-encoder dinilai ulang dari prediksi tersimpan ---
+# --- 6. final table, seed 42 ---
 import glob, re
 rows = []
 for f in sorted(glob.glob(str(RES / "task3_pred_V*_lr*.parquet"))):
     m = re.search(r"pred_(V\d(?:-jbprof)?)_(cls|reg)_lr([\d.e-]+)\.parquet$", f)
-    if not m: continue                                                          # seed 43/44 (_s43, _s44): lihat seed_check.py
+    if not m: continue                                                          # seeds 43/44: see seed_check.py
     v, kind, lr = m.groups()
     p = pd.read_parquet(f).query("split == 'test'").set_index("row").loc[te]; pr = p[["p0", "p1", "p2"]].values
     r = evaluate(d, pr, p.score.values, rank_score=pr @ [0, 1, 2] if kind == "cls" else None)
@@ -185,6 +182,6 @@ for f in sorted(glob.glob(str(RES / "task3_pred_V*_lr*.parquet"))):
 ce_all = pd.DataFrame(rows); ce_all.to_csv(RES / "task3_ce_rescored_seed42.csv", index=False)
 base = pd.read_csv(RES / "task3_baselines.csv").query("split == 'test' and seed == 42").pivot_table(index="model", columns="metric", values="value").reset_index()
 cols = ["model", "macro_F1", "ROC_AUC", "MAE", "Spearman", "Spearman_per_job", "NDCG@5", "MRR"]
-chosen = ce_all[(ce_all.model.str.endswith("cls") & (ce_all.lr == 2e-5)) | (ce_all.model.str.endswith("reg") & (ce_all.lr == 3e-5))]   # lr dipilih di val (notebook Colab)
+chosen = ce_all[(ce_all.model.str.endswith("cls") & (ce_all.lr == 2e-5)) | (ce_all.model.str.endswith("reg") & (ce_all.lr == 3e-5))]   # lr chosen on val (Colab notebook)
 final = pd.concat([base[cols], chosen[cols]], ignore_index=True); final.to_csv(RES / "task3_final_seed42.csv", index=False)
 print("\n== Tabel final (test, seed 42, ranking dgn skor kontinu)\n" + final.round(3).to_string(index=False))

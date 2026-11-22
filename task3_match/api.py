@@ -1,22 +1,8 @@
 """Task 3 API for the CLI: score_match() and rank().
-
-Model: Cross-Encoder V3 (jjzha/jobbert-base-cased fine-tuned, 3-class) = raw text + Task 1 entities + Task 2 profile,
-the variant that matches what main.py feeds it (see README for how it compares across seeds). The input is built by the SAME functions as training
-(task3_match/cross_encoder.py), so CLI inputs match what the model saw.
-
-Weights: models/match/V3-jbprof_cls_lr2e-05/ (not in git). If missing, they are downloaded once from the public Hugging Face
-repo Arxenarendra/jobbert-task3-match (override with env T3_MATCH_REPO); if that fails, a clear error is raised
-(no silent fallback).
-
-The cross-encoder alone saturates (most CVs near the top tier), so its probabilities are combined with explicit match
-signals by a small logistic-regression stacker (task3_match/stacking.py, fitted on validation, stored in
-data/cache/task3_stacker.json): skill coverage and job-title overlap from Task 1 entities, SBERT cosine, and the same
-three relative to the other CVs ranked for the job. So a CV's score depends on the other CVs it is ranked with.
-The stacker was fitted with peers, so a single CV (nothing to compare with) is scored by the cross-encoder alone.
-
-score = isotonic(E[tier]) of the stacker, fitted on validation; tier = argmax of the stacker probabilities.
-rank() orders by E[tier], which is continuous; the isotonic score is a step function with ties.
-"""
+Model: V3 cross-encoder (raw text + Task 1 entities + Task 2 profile), weights in models/match/ (downloaded once from
+Arxenarendra/jobbert-task3-match; override with env T3_MATCH_REPO; no silent fallback).
+Two or more CVs: a logistic-regression stacker (stacking.py) combines cross-encoder probabilities with match signals,
+so a score depends on the other CVs. One CV: cross-encoder alone. Ranking uses E[tier]; the isotonic score has ties."""
 import json
 import os
 from functools import lru_cache
@@ -30,7 +16,7 @@ from task3_match.common import ROOT
 from task3_match.cross_encoder import encode, ent_str
 from task3_match.stacking import STACKER, features, signals, stack_probs, stack_score, tokens
 
-TAG = "V3-jbprof_cls_lr2e-05"   # trained with the Task 2 JobBERT profiles, the same source main.py feeds it
+TAG = "V3-jbprof_cls_lr2e-05"   # trained with Task 2 JobBERT profiles
 MODEL_DIR = ROOT / "models" / "match" / TAG
 HF_REPO = os.environ.get("T3_MATCH_REPO", "Arxenarendra/jobbert-task3-match")
 MODEL_NAME = "Cross-Encoder V3 (JobBERT; raw text + Task 1 entities + Task 2 profile) + match signals (stacked)"

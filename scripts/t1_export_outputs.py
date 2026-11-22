@@ -1,7 +1,5 @@
-"""Task 1: bersihkan prediksi NER (data/ner_pred_*.parquet) dan tulis versi tanpa teks ke outputs/ner/.
-
-Jalankan dari root repo setelah scripts/t1_ner_predict.py --export:  python scripts/t1_export_outputs.py
-"""
+"""Task 1: clean NER predictions (data/ner_pred_*.parquet) and write text-free outputs to outputs/ner/.
+Run after: python scripts/t1_ner_predict.py --export"""
 import hashlib, re, shutil
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -14,11 +12,11 @@ md5 = lambda s: hashlib.md5((s or "").encode("utf8")).hexdigest()
 
 FUNC = {"to", "of", "in", "and", "or", "the", "a", "an", "for", "with", "at", "from", "since", "till", "until", "minimum", "min", "at least"}
 NUMW = r"\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty)\b"
-MAX_YEARS = 40                                    # di teks tanpa tanda baca "9.5 years" terbaca "95 years"
+MAX_YEARS = 40                                    # without punctuation "9.5 years" reads as "95 years"
 
 def keep(L, v):
-    if all(x in FUNC for x in v.split()): return False                              # hanya kata fungsi
-    if L == "EXPERIENCE": return bool(re.search(r"\d", v) or re.search(NUMW, v))   # "years", "present" = fragmen
+    if all(x in FUNC for x in v.split()): return False                              # function words only
+    if L == "EXPERIENCE": return bool(re.search(r"\d", v) or re.search(NUMW, v))   # "years", "present" = fragments
     if L == "EDUCATION": return v not in {"gpa", "of science", "of arts", "certified", "certifications"}
     return len(v) > 1 or v in {"c", "r"}
 

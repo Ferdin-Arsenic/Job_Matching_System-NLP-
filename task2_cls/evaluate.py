@@ -28,11 +28,7 @@ def predictions_from_probs(probs: dict) -> dict[str, np.ndarray]:
 
 
 def evaluate(data: pd.DataFrame, probs: dict) -> pd.DataFrame:
-    """Return long-format metrics; all probability columns follow OUTPUT_LABELS.
-
-    Unknown Level rows remain in Field/Sub-field metrics and consistency checks.
-    Level and three-output exact match are measured only on known Level rows.
-    """
+    """Long-format metrics. Unknown Level rows count for Field/Sub-field only; Level and exact match use known-Level rows."""
     validate_probabilities(probs, len(data))
     pred = predictions_from_probs(probs)
     known = data.level.ne("Unknown").to_numpy()

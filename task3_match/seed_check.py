@@ -1,7 +1,5 @@
-"""Task 3: konsistensi urutan varian lintas seed split (42/43/44). Metrik dihitung ulang dari task3_pred_{tag}.parquet
-dengan evaluate() yang sama dgn analysis.py (ranking = E[tier]); CSV lama V1-V3 dibuat sebelum ranking itu dipakai, jadi tidak dibaca.
-Test set tiap seed berbeda: bandingkan varian DALAM seed yang sama; mean/std hanya ringkasan.  Jalankan: python task3_match/seed_check.py
-"""
+"""Task 3: variant ranking across split seeds 42/43/44, recomputed from task3_pred_{tag}.parquet with analysis.py's evaluate().
+Test sets differ per seed: compare variants within a seed. Run: python task3_match/seed_check.py"""
 import sys
 from pathlib import Path
 import numpy as np, pandas as pd
