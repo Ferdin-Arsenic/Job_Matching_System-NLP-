@@ -139,6 +139,26 @@ interval over jobs in brackets:
 - Limits: a swap is a worst-case error (another CV's output), not the partial errors a real model makes; and the model
   was trained on predicted, already noisy, upstream outputs, which may be why it discounts the profile.
 
+### Additional experiment: stacking with explicit match signals (not used by the demo)
+
+The demo cross-encoder saturates: most CVs get an expected tier near the top whatever their content (on `examples/`,
+job1 gives the backend CV 1.77, the web designer 1.82 and the teacher 1.64 out of 2). `task3_match/stacking.py` fits a
+logistic regression on the validation rows that combines the cross-encoder probabilities with three explicit signals:
+share of the job's skills found in the CV, job-title overlap, and SBERT cosine, each also relative to the other
+candidates of the same job. No BERT model is retrained. Test set:
+
+| Mean over seeds 42/43/44 | Macro-F1 | ROC-AUC | NDCG@5 | MRR |
+|---|---|---|---|---|
+| Cross-encoder only (demo) | 0.388 | 0.656 | 0.689 | 0.742 |
+| Cross-encoder + match signals | 0.434 | 0.670 | 0.717 | 0.864 |
+
+- Macro-F1, NDCG@5 and MRR improve on all three seeds; ROC-AUC on two of three.
+- On seed 42 alone the paired bootstrap intervals still include 0 (Macro-F1 +0.06 [-0.01, +0.14], MRR +0.10 [0.00, +0.24]),
+  so this is a consistent direction, not a proven gain.
+- Not adopted for the demo because scores would depend on the other CVs in the folder (relative features) and an extra
+  SBERT model would be loaded. On the demo examples (checked, not tuned) it ranks the backend CV first for job1 and moves
+  the teacher from Good Fit to Potential Fit; job2 is unchanged.
+
 ## Limitations
 
 - **Job descriptions have no gold NER labels** in the dataset we planned for (`khaliladimassi/cleaned-job-description`),
@@ -179,6 +199,7 @@ python task3_match/baselines.py     # majority, resume prior, BM25, SBERT over 3
 python task3_match/analysis.py      # bootstrap intervals, error analysis, charts, final table (CPU)
 python task3_match/seed_check.py    # cross-encoder variants over seeds 42/43/44 (needs the Colab predictions)
 python task3_match/error_propagation.py   # corrupt Task 1/Task 2 inputs to the demo model (CPU, ~40 min)
+python task3_match/stacking.py      # additional experiment: cross-encoder + explicit match signals (CPU, ~3 min)
 ```
 
 The cross-encoder runs need a GPU: open `notebooks/task3_crossencoder_colab.ipynb` in Colab (it clones the repo with a

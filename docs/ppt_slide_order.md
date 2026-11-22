@@ -30,6 +30,7 @@ Pembagian pembicara hanya usulan, perlu disepakati tim.
 | **Gabungan** | | | |
 | 19 | Kontribusi antar task | Apa yang diberikan NER dan Classification ke matching (dari ablation) | Ferdin / bergantian |
 | 20 | Error propagation | Input Task 1/Task 2 ke model demo sengaja dibuat salah di test: entity salah → ROC-AUC turun ke 0,51 (≈ acak), profil salah → hanya −0,03. Tabel di README bagian *Error propagation*, data `data/results/task3_error_propagation.csv` | Ferdin |
+| 20b | Eksperimen tambahan (opsional) | Cross-encoder jenuh (CV backend 1,77 vs web designer 1,82 vs guru 1,64). Digabung dengan sinyal kecocokan eksplisit (skill, jabatan, SBERT): Macro-F1 0,388 → 0,434, MRR 0,742 → 0,864 (rata-rata 3 seed, naik di 3/3 seed; CI seed 42 masih mencakup 0). Tidak dipakai demo. Sumber: README bagian *Additional experiment*, `data/results/task3_stacking_*.csv` | Ferdin |
 | 21 | Tabel ringkasan semua task | Satu baris per task: baseline, proposed, metrik utama | Bebas |
 | **Demo** | | | |
 | 22 | Cara menjalankan | `python main.py --cv ... --job ... --verbose`, input dan output | Bebas |
