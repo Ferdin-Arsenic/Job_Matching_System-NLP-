@@ -109,8 +109,35 @@ Re-running with two more split/training seeds (43, 44; each seed has a different
 - Task 1 (reported in its notebook): entity F1 on CV test 0.47 exact / 0.60 partial, on JD test 0.57 / 0.80.
 - Task 2: JobBERT was chosen on validation over the TF-IDF + Logistic Regression baselines; see
   `notebooks/task2_classification.ipynb` and the Hugging Face repo for its results.
-- Full table: `data/results/task3_final_seed42.csv`; error analysis: `data/results/task3_error_*.csv`; charts are
-  produced by `task3_match/analysis.py` into `figures/`.
+- Full table: `data/results/task3_final_seed42.csv`; error analysis of the demo model (V3 with JobBERT profiles):
+  `data/results/task3_error_*.csv` and `task3_confusion_V3jb.csv`; charts are produced by `task3_match/analysis.py`
+  into `figures/`. The demo model over-predicts Good Fit: 94 of 328 true No Fit pairs are called Good Fit (44 for the
+  baseline-profile V3), and only 2% of those false positives involve a CV that is too junior for the job.
+
+### Error propagation (how much Task 1 and Task 2 errors hurt matching)
+
+The matching dataset has no gold NER or gold Field for its CVs, so we cannot compare predicted against gold upstream
+labels. Instead the demo model stays fixed and its upstream input is made wrong on the test set: each CV (or job) gets the
+Task 1 entities or Task 2 profile of another random one, for 50% or 100% of them (`task3_match/error_propagation.py`,
+CPU; the clean run reproduces the Colab predictions, 99.8% same tier). Change versus clean input, 95% paired bootstrap
+interval over jobs in brackets:
+
+| Upstream input made wrong | Macro-F1 | ROC-AUC | NDCG@5 | Tier predictions changed |
+|---|---|---|---|---|
+| None (clean) | 0.379 | 0.635 | 0.642 | - |
+| Task 2 profile, 50% of CVs | -0.011 [-0.033, 0.011] | -0.003 [-0.020, 0.013] | +0.040 [-0.005, 0.092] | 9% |
+| Task 2 profile, all CVs | -0.008 [-0.046, 0.033] | **-0.026** [-0.046, -0.003] | +0.039 [-0.021, 0.105] | 16% |
+| Task 1 entities, 50% of CVs and jobs | **-0.056** [-0.116, -0.006] | **-0.089** [-0.177, -0.009] | -0.023 [-0.154, 0.092] | 28% |
+| Task 1 entities, all | -0.067 [-0.190, 0.047] | **-0.125** [-0.224, -0.036] | -0.096 [-0.279, 0.058] | 42% |
+| Both, all | -0.085 [-0.198, 0.023] | **-0.140** [-0.233, -0.060] | -0.145 [-0.320, 0.013] | 42% |
+
+- **Task 1 errors propagate**: wrong entities push ROC-AUC down to chance (0.51) and change 28-42% of tier calls.
+- **Task 2 errors barely do**: a completely wrong profile moves ROC-AUC by -0.03 and leaves Macro-F1 and ranking within
+  noise. The model has learned to rely little on the profile, which matches the ablation (V3 is not reliably above V2).
+  Consistently, clean accuracy is not lower where the two Task 2 models disagree on Sub-field (0.46, 348 pairs) than
+  where they agree (0.42, 308 pairs).
+- Limits: a swap is a worst-case error (another CV's output), not the partial errors a real model makes; and the model
+  was trained on predicted, already noisy, upstream outputs, which may be why it discounts the profile.
 
 ## Limitations
 
@@ -126,7 +153,7 @@ Re-running with two more split/training seeds (43, 44; each seed has a different
 - **CV overlap between train and test:** 95-97% of test pairs use a CV that also appears in training (the split is per
   job, so jobs never overlap). A baseline that guesses the tier from the CV alone reaches Macro-F1 0.37, so Macro-F1
   alone overstates matching ability; the per-job ranking metrics are the more honest ones.
-- Small test set (26 jobs, 23 with at least 3 CVs) and a single seed. Entities from ATS-style text can contain words
+- Small test set (26 jobs, 23 with at least 3 CVs); the cross-encoder was run on three split seeds, the other analyses on seed 42 only. Entities from ATS-style text can contain words
   glued together (for example `analystlocation`).
 - The demo CVs and jobs in `examples/` are synthetic and the "expected" fits in `scripts/make_examples.py` are the
   authors' judgement.
@@ -150,11 +177,13 @@ models/                 downloaded weights (not in git)
 ```bash
 python task3_match/baselines.py     # majority, resume prior, BM25, SBERT over 3 split seeds (CPU)
 python task3_match/analysis.py      # bootstrap intervals, error analysis, charts, final table (CPU)
+python task3_match/seed_check.py    # cross-encoder variants over seeds 42/43/44 (needs the Colab predictions)
+python task3_match/error_propagation.py   # corrupt Task 1/Task 2 inputs to the demo model (CPU, ~40 min)
 ```
 
 The cross-encoder runs need a GPU: open `notebooks/task3_crossencoder_colab.ipynb` in Colab (it clones the repo with a
 `GH_TOKEN` secret, runs 8 fine-tuning runs, and saves results to Google Drive). Seed 42 everywhere; the per-job splits
-are stored in `data/splits/task3.json`.
+are stored in `data/splits/task3.json`. `notebooks/task3_seed_check_colab.ipynb` reruns the variants on seeds 43 and 44.
 
 ## Team
 

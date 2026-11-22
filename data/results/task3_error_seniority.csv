@@ -2,4 +2,4 @@ kelompok,n,persen_resume_terlalu_junior,persen_syarat_tahun_diketahui
 semua pasangan test,656,0.06097560975609756,0.4801829268292683
 Good Fit asli,164,0.03048780487804878,0.3597560975609756
 No Fit asli,328,0.07317073170731707,0.45121951219512196
-"false positive (pred Good, asli No Fit)",44,0.022727272727272728,0.18181818181818182
+"false positive (pred Good, asli No Fit)",94,0.02127659574468085,0.19148936170212766
