@@ -1,0 +1,35 @@
+model,variant,run,lr,best_ckpt,profiles,split,metric,value
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,macro_F1,0.50644099553156
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,MAE,18.301392434590053
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,Spearman,0.36068621033613674
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,ROC_AUC,0.6752099017298964
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,P_No Fit,0.6340057636887608
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,R_No Fit,0.6896551724137931
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,F1_No Fit,0.6606606606606606
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,P_Potential Fit,0.35638297872340424
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,R_Potential Fit,0.4161490683229814
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,F1_Potential Fit,0.3839541547277937
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,P_Good Fit,0.6039603960396039
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,R_Good Fit,0.391025641025641
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,F1_Good Fit,0.47470817120622566
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,Spearman_per_job,0.3311416477998984
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,NDCG@5,0.684117904543803
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,MRR,0.77
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,val,n_jobs_ranked,23.0
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,macro_F1,0.3919242670426842
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,MAE,21.24891351709864
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,Spearman,0.2567758930845251
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,ROC_AUC,0.6839217915008664
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,P_No Fit,0.6789667896678967
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,R_No Fit,0.5768025078369906
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,F1_No Fit,0.6237288135593221
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,P_Potential Fit,0.3541666666666667
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,R_Potential Fit,0.6496815286624203
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,F1_Potential Fit,0.4584269662921348
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,P_Good Fit,0.14473684210526316
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,R_Good Fit,0.06918238993710692
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,F1_Good Fit,0.09361702127659574
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,Spearman_per_job,0.20852633159692277
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,NDCG@5,0.5848967443568319
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,MRR,0.5909090909090909
+Cross-Encoder V1 cls,V1,cls,2e-05,checkpoint-1276,,test,n_jobs_ranked,21.0

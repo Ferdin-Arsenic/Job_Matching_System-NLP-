@@ -88,6 +88,21 @@ One split, one run. 95% bootstrap intervals over jobs are in `data/results/task3
   statistically indistinguishable from each other (paired bootstrap, intervals include 0), so we cannot claim the profile
   helps in general; it helped only when the profile source matched the one seen in training.
 - **Not** supported: V2 over V1 and V3 over V2 (the intervals include 0); read those as "tends to improve".
+
+Re-running with two more split/training seeds (43, 44; each seed has a different test set, so compare within a seed;
+`python task3_match/seed_check.py`, runs in `data/results/task3_seed_check*.csv`). Macro-F1 on test:
+
+| Model | seed 42 | seed 43 | seed 44 | mean ± std |
+|---|---|---|---|---|
+| V1 (raw text) | 0.353 | 0.319 | 0.392 | 0.355 ± 0.036 |
+| V2 (+ entities) | 0.399 | 0.441 | 0.412 | 0.418 ± 0.021 |
+| V3 (+ profile, baseline profiles) | 0.481 | 0.450 | 0.386 | 0.439 ± 0.048 |
+| V3 (+ profile, JobBERT profiles) | 0.379 | 0.370 | 0.414 | 0.388 ± 0.023 |
+
+- On average V1 is lowest and V2/V3 are higher, but the gaps (0.03-0.08) are about one standard deviation. With three
+  seeds we can say that adding Task 1 entities *tends* to help; we cannot rank V2 against either V3.
+- The best V3 (baseline profiles) was first on seeds 42 and 43 and last on seed 44, so its lead over V1 on seed 42 was
+  partly luck of the split. Ranking metrics are even noisier (MRR std up to 0.18 over about 26 jobs per test set).
 - The published weights (`Arxenarendra/jobbert-task3-match`) were trained on baseline profiles, but the CLI feeds them
   JobBERT profiles, so the demo runs under the mismatch that produced the weaker row.
 - Task 1 (reported in its notebook): entity F1 on CV test 0.47 exact / 0.60 partial, on JD test 0.57 / 0.80.
