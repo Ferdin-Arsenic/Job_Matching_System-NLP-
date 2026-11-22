@@ -30,6 +30,13 @@ def bm25_raw(df, train_idx):
     return raw, z
 
 
+def sbert_embed(model, text):
+    """One unit vector per text: 150-word chunks (fit 256 wordpieces), mean of chunk embeddings. Also used by the demo."""
+    w = text.split(); ch = [" ".join(w[i:i + 150]) for i in range(0, max(len(w), 1), 150)]
+    v = model.encode(ch, normalize_embeddings=True).mean(0)
+    return v / np.linalg.norm(v)
+
+
 def sbert_raw(df):
     """Cosine job vs resume. Teks dipecah per 150 kata (muat 256 wordpiece), embed per chunk, rata-rata. Cache di data/cache."""
     cache = DATA / "cache" / "sbert_minilm.npz"
@@ -38,10 +45,7 @@ def sbert_raw(df):
         from sentence_transformers import SentenceTransformer
         m = SentenceTransformer(SBERT, device="cpu"); m.max_seq_length = 256
         texts = {**dict(zip(df.resume_id, df.resume)), **dict(zip(df.job_id, df.job))}
-        emb = {}
-        for k, t in texts.items():
-            w = t.split(); ch = [" ".join(w[i:i + 150]) for i in range(0, max(len(w), 1), 150)]
-            v = m.encode(ch, normalize_embeddings=True).mean(0); emb[k] = v / np.linalg.norm(v)
+        emb = {k: sbert_embed(m, t) for k, t in texts.items()}
         np.savez(cache, emb=np.array(emb, dtype=object))
     return np.array([emb[r] @ emb[j] for r, j in zip(df.resume_id, df.job_id)])
 

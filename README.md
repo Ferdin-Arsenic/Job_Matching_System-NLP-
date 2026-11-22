@@ -33,7 +33,7 @@ python main.py --cv-dir examples/cvs --job examples/job1.txt
 
 `--job` takes a `.txt` path or the job text itself; `--cv` takes `.pdf` or `.txt`.
 
-- **First run downloads about 1.3 GB** of weights (Task 1 ~430 MB, Task 2 ~415 MB, Task 3 ~433 MB) into `models/`. It took about 5 minutes on one connection; later runs reuse them.
+- **First run downloads about 1.4 GB** of weights (Task 1 ~430 MB, Task 2 ~415 MB, Task 3 ~433 MB, SBERT ~90 MB) into `models/` and the Hugging Face cache. It took about 5 minutes on one connection; later runs reuse them.
 - After that a run takes about 20 s for one CV and about 25-30 s for five CVs on a laptop CPU (measured, including model loading).
 - Scanned or empty PDFs stop with an explicit error (OCR is out of scope). Two-column CVs may be read in the wrong order.
 
@@ -44,25 +44,26 @@ python main.py --cv-dir examples/cvs --job examples/job1.txt
 
 ```
 python main.py --cv-dir examples/cvs --job examples/job2.txt        (job2 = Staff Accountant)
-#  CV        Score  Tier      Field / Sub-field / Level
-1  cv4.pdf    50.9  Potential Fit  Finance / Accountant / Senior
-2  cv5.pdf    42.8  No Fit    Education & Health / Education / Senior
-3  cv2.pdf    25.3  No Fit    IT / Web Designing / Mid
-4  cv3.pdf    25.3  No Fit    Engineering & Construction / Mechanical Engineer / Senior
-5  cv1.pdf    24.5  No Fit    IT / Python Developer / Senior
+#  CV        Score  Tier           Field / Sub-field / Level
+1  cv4.pdf    65.9  Potential Fit  Finance / Accountant / Senior
+2  cv5.pdf    34.4  No Fit         Education & Health / Education / Senior
+3  cv2.pdf    25.5  No Fit         IT / Web Designing / Mid
+4  cv3.pdf    25.4  No Fit         Engineering & Construction / Mechanical Engineer / Senior
+5  cv1.pdf    24.5  No Fit         IT / Python Developer / Senior
 
 python main.py --cv-dir examples/cvs --job examples/job1.txt        (job1 = Backend Software Engineer)
-1  cv2.pdf    74.9  Good Fit  IT / Web Designing / Mid
-2  cv1.pdf    64.8  Good Fit  IT / Python Developer / Senior
-3  cv5.pdf    55.3  Good Fit  Education & Health / Education / Senior
-4  cv3.pdf    50.9  No Fit    Engineering & Construction / Mechanical Engineer / Senior
-5  cv4.pdf    34.9  No Fit    Finance / Accountant / Senior
+1  cv1.pdf    65.9  Good Fit       IT / Python Developer / Senior
+2  cv2.pdf    56.2  Good Fit       IT / Web Designing / Mid
+3  cv5.pdf    54.3  Potential Fit  Education & Health / Education / Senior
+4  cv3.pdf    44.5  No Fit         Engineering & Construction / Mechanical Engineer / Senior
+5  cv4.pdf    25.5  No Fit         Finance / Accountant / Senior
 ```
 
-Read these honestly: for the accountant job the order is sensible. For the backend job the model ranks the junior web
-designer (`cv2`) above the backend developer (`cv1`) and calls the teacher (`cv5`) a Good Fit, which is wrong. The
-test-set numbers below (Good Fit precision of about 0.4) say the same: tier calls are unreliable, so use the **ranking
-within one job** rather than the absolute tier or score. Scores come from a step function, so different CVs can share
+Read these honestly: both orders are sensible, but tier calls are still loose (the junior web designer is a Good Fit
+for the backend job, the teacher a Potential Fit), so use the **ranking within one job** rather than the absolute tier
+or score. Before the stacker (cross-encoder alone) the backend job ranked the web designer above the backend developer
+and called the teacher a Good Fit. With `--cv` (one CV) the cross-encoder alone is used, because the stacker compares
+candidates with each other; one CV alone gets the same result as before (cv1 vs job1: 64.8, Good Fit). Scores come from a step function, so different CVs can share
 the same score; the ranking breaks ties with the expected tier.
 
 ## Results (Task 3, test set, seed 42, 26 jobs)
@@ -139,6 +140,29 @@ interval over jobs in brackets:
 - Limits: a swap is a worst-case error (another CV's output), not the partial errors a real model makes; and the model
   was trained on predicted, already noisy, upstream outputs, which may be why it discounts the profile.
 
+### Stacking with explicit match signals (used by the demo when ranking two or more CVs)
+
+The demo cross-encoder saturates: most CVs get an expected tier near the top whatever their content (on `examples/`,
+job1 gives the backend CV 1.77, the web designer 1.82 and the teacher 1.64 out of 2). `task3_match/stacking.py` fits a
+logistic regression on the validation rows that combines the cross-encoder probabilities with three explicit signals:
+share of the job's skills found in the CV, job-title overlap, and SBERT cosine, each also relative to the other
+candidates of the same job. No BERT model is retrained. Test set:
+
+| Mean over seeds 42/43/44 | Macro-F1 | ROC-AUC | NDCG@5 | MRR |
+|---|---|---|---|---|
+| Cross-encoder only | 0.388 | 0.656 | 0.689 | 0.742 |
+| Cross-encoder + match signals (demo ranking) | 0.434 | 0.670 | 0.717 | 0.864 |
+
+- Macro-F1, NDCG@5 and MRR improve on all three seeds; ROC-AUC on two of three.
+- On seed 42 alone the paired bootstrap intervals still include 0 (Macro-F1 +0.06 [-0.01, +0.14], MRR +0.10 [0.00, +0.24]),
+  so this is a consistent direction, not a proven gain.
+- In the demo (`task3_match/api.py`, parameters in `data/cache/task3_stacker.json`, fitted on seed-42 validation) a CV's
+  score depends on the other CVs in the folder, because of the relative features. One CV alone (`--cv`) is scored by the
+  cross-encoder only, since the stacker was fitted with peers to compare against.
+- The demo examples were only checked, never used for fitting: the backend CV moves to first place for job1 and the
+  teacher from Good Fit to Potential Fit; job2 keeps the accountant first.
+- The error analysis and error propagation sections above describe the cross-encoder alone (before stacking).
+
 ## Limitations
 
 - **Job descriptions have no gold NER labels** in the dataset we planned for (`khaliladimassi/cleaned-job-description`),
@@ -179,6 +203,7 @@ python task3_match/baselines.py     # majority, resume prior, BM25, SBERT over 3
 python task3_match/analysis.py      # bootstrap intervals, error analysis, charts, final table (CPU)
 python task3_match/seed_check.py    # cross-encoder variants over seeds 42/43/44 (needs the Colab predictions)
 python task3_match/error_propagation.py   # corrupt Task 1/Task 2 inputs to the demo model (CPU, ~40 min)
+python task3_match/stacking.py      # stacker used by the demo ranking: fit, evaluate, save data/cache/task3_stacker.json (CPU, ~3 min)
 ```
 
 The cross-encoder runs need a GPU: open `notebooks/task3_crossencoder_colab.ipynb` in Colab (it clones the repo with a

@@ -1,9 +1,11 @@
 """End-to-end pipeline: CV text + job text -> Task 1 NER -> Task 2 profile (CV only) -> Task 3 match."""
+import gc
 import os
 from pathlib import Path
 import warnings
 
 from pipeline.io import read_cv
+from task1_ner import api as ner_api
 from task1_ner.api import extract_many
 from task2_cls.api import get_classifier
 from task3_match import api as match_api
@@ -46,11 +48,13 @@ def analyze(cv_paths: list, job_text: str) -> dict:
     profiles = classifier.classify_many([cv["text"] for cv in cvs], entities[1:])
     for cv, ent, profile in zip(cvs, entities[1:], profiles):
         cv["entities"], cv["profile"] = ent, profile
+    task2_name = f"{classifier.metadata['model']} ({classifier.metadata['status']}), Level from Task 1 years"
+    # Free Task 1/2 models before Task 3 (+ SBERT) loads: all four at once crash 8 GB laptops.
+    del classifier; get_classifier.cache_clear(); ner_api._model.cache_clear(); gc.collect()
     ranked = match_api.rank(cvs, job)
     for cv in ranked:
         cv["note"] = seniority_note(cv["profile"], job["entities"])
     return {"job": job, "ranked": ranked,
             "models": {"task1": "JobBERT-CRF (WwzFwz/jobbert-crf-cv-jd-ner)",
-                       "task2": f"{classifier.metadata['model']} ({classifier.metadata['status']}), "
-                                f"Level from Task 1 years",
+                       "task2": task2_name,
                        "task3": match_api.MODEL_NAME}}
