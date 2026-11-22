@@ -1,4 +1,8 @@
-"""Runtime contracts for the grouped Task 1 output (strings, no character spans) and downstream tasks."""
+"""Runtime contracts for the actual grouped Task 1 output and downstream tasks.
+
+Grouped entities contain strings, not character spans. Export rows may contain
+extra metadata, which adapt_task1_entities deliberately excludes.
+"""
 
 from collections.abc import Mapping
 from math import isfinite

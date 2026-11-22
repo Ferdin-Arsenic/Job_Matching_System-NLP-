@@ -21,7 +21,10 @@ def normalize_like_resumeatlas(text: str) -> str:
 
 
 def entities_to_text(entities: Mapping) -> str:
-    """Concatenate entities in fixed order (SKILL, JOB_TITLE, EDUCATION, EXPERIENCE), normalized once; no numeric metadata."""
+    """Stable SKILL -> JOB_TITLE -> EDUCATION -> EXPERIENCE order, no fake spans.
+    Normalization happens once on the concatenated values. Numeric metadata is
+    excluded so the entity-only comparison uses extracted strings only.
+    """
     grouped = adapt_task1_entities(entities)
     return normalize_like_resumeatlas(" ".join(v for label in ENTITY_LABELS for v in grouped[label]))
 
@@ -58,6 +61,9 @@ def training_level_from_text(text: str) -> str:
 
 
 def ner_level_from_entities(entities: Mapping) -> str:
-    """Level from Task 1's experience estimate; more than 40 years becomes Unknown (as in the export cleanup)."""
+    """Comparison rule using Task 1's duration/merged-calendar-interval estimate.
+    Raw inference may return >40 years; mirror export cleanup as Unknown without
+    mutating the original entities or recomputing their experience estimate.
+    """
     years = adapt_task1_entities(entities)["experience_years"]
     return "Unknown" if years is not None and years > 40 else level_from_years(years)

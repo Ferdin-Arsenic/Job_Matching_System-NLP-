@@ -182,6 +182,25 @@ candidates of the same job. No BERT model is retrained. Test set:
 - The demo CVs and jobs in `examples/` are synthetic and the "expected" fits in `scripts/make_examples.py` are the
   authors' judgement.
 
+## Datasets
+
+Copies of all datasets are in Google Drive:
+https://drive.google.com/drive/folders/193WEVcSjKlk4OgJllRtZalp6pGBpJJ2I?usp=sharing
+(BEAM design files: https://drive.google.com/drive/folders/1W985tma4c4wzifBoCa7Y40uBAGiDcEVx?usp=sharing).
+Large files are split into parts; after downloading the folder, run
+`python merge_parts.py <download_dir>` from the repo root to rebuild the files under `data/`, then
+`python -m task2_cls.data --rebuild` once (Task 2 pins the file hash of the original export; content and splits are the same).
+The notebooks can also download them from the original sources:
+
+| Task | Dataset | Size | License |
+|---|---|---|---|
+| 1 | [Resume NER Training Dataset](https://www.kaggle.com/datasets/yashpwrr/resume-ner-training-dataset) | 5,960 CVs (824 kept) | MIT |
+| 1 | [Green et al. 2022 skill extraction corpus](https://github.com/acp19tag/skill-extraction-dataset) | job-description sentences, 336-sentence gold test | CC BY 4.0 |
+| 2 | [ResumeAtlas](https://huggingface.co/datasets/ahmedheakl/resume-atlas) | 13,389 CVs, 43 categories (11,345 after dedup) | MIT |
+| 3 | [resume-ats-score-v1-en](https://huggingface.co/datasets/0xnbk/resume-ats-score-v1-en) | 6,374 CV-job pairs | Apache-2.0 |
+
+`khaliladimassi/cleaned-job-description` (Kaggle) was used only for exploration and is not in the Drive folder.
+
 ## Repository layout
 
 ```
