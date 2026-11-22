@@ -29,13 +29,13 @@ Pembagian pembicara hanya usulan, perlu disepakati tim.
 | 18 | Error analysis | 3–5 contoh error, resume yang sama di train dan test | Ferdin |
 | **Gabungan** | | | |
 | 19 | Kontribusi antar task | Apa yang diberikan NER dan Classification ke matching (dari ablation) | Ferdin / bergantian |
-| 20 | Error propagation | Kesalahan NER dan Classification menurunkan skor matching (`(planned)` jika belum dikerjakan) | Ferdin |
+| 20 | Error propagation | Input Task 1/Task 2 ke model demo sengaja dibuat salah di test: entity salah → ROC-AUC turun ke 0,51 (≈ acak), profil salah → hanya −0,03. Tabel di README bagian *Error propagation*, data `data/results/task3_error_propagation.csv` | Ferdin |
 | 21 | Tabel ringkasan semua task | Satu baris per task: baseline, proposed, metrik utama | Bebas |
 | **Demo** | | | |
 | 22 | Cara menjalankan | `python main.py --cv ... --job ... --verbose`, input dan output | Bebas |
 | 23 | Demo live | 2–3 input berbeda via command prompt (siapkan rekaman cadangan, ±20 detik per CV) | Bebas |
 | **Penutup** | | | |
-| 24 | Limitasi | Job desc tanpa gold NER, Field = mapping manual, Level = heuristik (cakupan 47%), tier = band skor, satu seed | Bebas |
+| 24 | Limitasi | Job desc tanpa gold NER, Field = mapping manual, Level = heuristik (cakupan 47%), tier = band skor, test set kecil (26 job; cross-encoder 3 seed) | Bebas |
 | 25 | Kesimpulan & future work | Poin per task | Semua |
 | 26 | Kontribusi anggota | Siapa mengerjakan apa | Semua |
 | 27 | Q&A | | Semua |
@@ -45,6 +45,6 @@ Pembagian pembicara hanya usulan, perlu disepakati tim.
 ## Catatan
 
 - **Demo setelah hasil**: penonton sudah paham tiap tahap sehingga output demo mudah dibaca. Jika dosen lebih suka demo di awal, pindahkan slide 22–23 ke setelah slide 4 dan ulang singkat di akhir.
-- **Slide 20 (error propagation)** satu-satunya yang butuh kerja bersama. Jika waktu mepet, jadikan satu baris di slide limitasi dan tandai `(planned)`.
+- **Slide 20 (error propagation)** sudah dikerjakan (`task3_match/error_propagation.py`). Sebutkan batasannya: tidak ada label gold di dataset matching, jadi yang diukur adalah sensitivitas terhadap output upstream yang salah total, bukan error nyata model Task 1/Task 2.
 - **Waktu 15–20 menit**: gabungkan slide 6–7, 10–11, 14–15 sehingga jadi ±22 slide. Slide error analysis (9, 13, 18) tetap terpisah karena wajib.
 - **Angka di slide** harus diambil dari file hasil (`data/*.csv`, `data/results/`), bukan dari CLAUDE.md. Model yang belum dijalankan ditandai `(planned)`.

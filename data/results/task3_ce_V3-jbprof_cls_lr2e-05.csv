@@ -1,0 +1,35 @@
+model,variant,run,lr,best_ckpt,profiles,split,metric,value
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,macro_F1,0.45398765383141004
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,MAE,18.304743984129374
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,Spearman,0.34993218846162305
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,ROC_AUC,0.6997242850619028
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,P_No Fit,0.6120689655172413
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,R_No Fit,0.665625
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,F1_No Fit,0.6377245508982036
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,P_Potential Fit,0.3829787234042553
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,R_Potential Fit,0.33962264150943394
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,F1_Potential Fit,0.36
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,P_Good Fit,0.3767123287671233
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,R_Good Fit,0.3525641025641026
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,F1_Good Fit,0.36423841059602646
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,Spearman_per_job,0.34908852025503256
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,NDCG@5,0.7382540959734513
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,MRR,0.769230769230769
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,val,n_jobs_ranked,22.0
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,macro_F1,0.3791970548381955
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,MAE,20.151686562715774
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,Spearman,0.24142418266098822
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,ROC_AUC,0.635272076806134
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,P_No Fit,0.6189024390243902
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,R_No Fit,0.6189024390243902
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,F1_No Fit,0.6189024390243902
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,P_Potential Fit,0.3055555555555556
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,R_Potential Fit,0.20121951219512196
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,F1_Potential Fit,0.2426470588235294
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,P_Good Fit,0.2409090909090909
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,R_Good Fit,0.3231707317073171
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,F1_Good Fit,0.2760416666666667
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,Spearman_per_job,0.2208694106561567
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,NDCG@5,0.6364693339765854
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,MRR,0.7916666666666666
+Cross-Encoder V3 cls,V3,cls,2e-05,checkpoint-954,profiles_jobbert.parquet,test,n_jobs_ranked,23.0

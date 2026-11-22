@@ -80,16 +80,17 @@ if __name__ == "__main__":
     ap.add_argument("--bs", type=int, default=16)
     ap.add_argument("--sample", type=int, default=0, help="SAMPLE_N per split untuk tes CPU (0 = penuh)")
     ap.add_argument("--profiles", default="profiles_stub.parquet", help="file di data/cache; ganti ke output Task 2 bila sudah ada")
+    ap.add_argument("--seed", type=int, default=SEED, help="seed split (data/splits/task3.json) sekaligus seed training; 42 = utama")
     ap.add_argument("--no-save", action="store_true")
     ap.add_argument("--ckpt-dir", default=str(ROOT / "models" / "match" / "_ckpt"),
                     help="checkpoint per epoch; jika sudah ada checkpoint untuk tag ini, training dilanjutkan dari situ")
     ap.add_argument("--backbone", default=BACKBONE, help="hanya untuk smoke test CPU, mis. google/bert_uncased_L-2_H-128_A-2")
     a = ap.parse_args()
     stub = a.variant == "V3" and "stub" in a.profiles
-    tag = f"{a.variant}{'-stub' if stub else ''}{'-jbprof' if a.variant == 'V3' and 'jobbert' in a.profiles else ''}_{a.run}_lr{a.lr:g}" + (f"_sample{a.sample}" if a.sample else "")
-    set_seed(SEED)
+    tag = f"{a.variant}{'-stub' if stub else ''}{'-jbprof' if a.variant == 'V3' and 'jobbert' in a.profiles else ''}_{a.run}_lr{a.lr:g}" + (f"_sample{a.sample}" if a.sample else "") + (f"_s{a.seed}" if a.seed != SEED else "")
+    set_seed(a.seed)
 
-    df = load(); sp = get_splits(df)[SEED]
+    df = load(); sp = get_splits(df)[a.seed]
     idx = {k: np.array(v[:a.sample] if a.sample else v) for k, v in sp.items()}
     tk = AutoTokenizer.from_pretrained(BACKBONE)   # tokenizer selalu JobBERT (vocab 28996 muat di model tiny 30522)
     job, res = build_texts(df, a.variant, profiles=a.profiles)
@@ -104,7 +105,7 @@ if __name__ == "__main__":
                              load_best_model_at_end=True, metric_for_best_model="mae" if a.run == "reg" else "macro_f1",
                              greater_is_better=a.run == "cls", learning_rate=a.lr, num_train_epochs=a.epochs,
                              per_device_train_batch_size=a.bs, per_device_eval_batch_size=a.bs * 2, warmup_steps=int(0.1 * steps),
-                             weight_decay=0.01, fp16=torch.cuda.is_available(), seed=SEED, report_to="none", logging_steps=50)
+                             weight_decay=0.01, fp16=torch.cuda.is_available(), seed=a.seed, report_to="none", logging_steps=50)
     tr = Trainer(model=model, args=args, train_dataset=ds["train"], eval_dataset=ds["val"], data_collator=DataCollatorWithPadding(tk),
                  compute_metrics=metrics_fn(a.run), callbacks=[EarlyStoppingCallback(early_stopping_patience=1)])
     resume = any(out_dir.glob("checkpoint-*"))

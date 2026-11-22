@@ -45,18 +45,18 @@ python main.py --cv-dir examples/cvs --job examples/job1.txt
 ```
 python main.py --cv-dir examples/cvs --job examples/job2.txt        (job2 = Staff Accountant)
 #  CV        Score  Tier      Field / Sub-field / Level
-1  cv4.pdf    60.6  Good Fit  Finance / Accountant / Senior
-2  cv5.pdf    37.7  No Fit    Education & Health / Education / Senior
-3  cv2.pdf    37.7  No Fit    IT / Web Designing / Mid
-4  cv3.pdf    25.0  No Fit    Engineering & Construction / Mechanical Engineer / Senior
-5  cv1.pdf    25.0  No Fit    IT / Python Developer / Senior
+1  cv4.pdf    50.9  Potential Fit  Finance / Accountant / Senior
+2  cv5.pdf    42.8  No Fit    Education & Health / Education / Senior
+3  cv2.pdf    25.3  No Fit    IT / Web Designing / Mid
+4  cv3.pdf    25.3  No Fit    Engineering & Construction / Mechanical Engineer / Senior
+5  cv1.pdf    24.5  No Fit    IT / Python Developer / Senior
 
 python main.py --cv-dir examples/cvs --job examples/job1.txt        (job1 = Backend Software Engineer)
-1  cv2.pdf    73.8  Good Fit  IT / Web Designing / Mid
-2  cv1.pdf    73.8  Good Fit  IT / Python Developer / Senior
-3  cv5.pdf    60.6  Good Fit  Education & Health / Education / Senior
-4  cv3.pdf    46.7  No Fit    Engineering & Construction / Mechanical Engineer / Senior
-5  cv4.pdf    37.7  No Fit    Finance / Accountant / Senior
+1  cv2.pdf    74.9  Good Fit  IT / Web Designing / Mid
+2  cv1.pdf    64.8  Good Fit  IT / Python Developer / Senior
+3  cv5.pdf    55.3  Good Fit  Education & Health / Education / Senior
+4  cv3.pdf    50.9  No Fit    Engineering & Construction / Mechanical Engineer / Senior
+5  cv4.pdf    34.9  No Fit    Finance / Accountant / Senior
 ```
 
 Read these honestly: for the accountant job the order is sensible. For the backend job the model ranks the junior web
@@ -77,15 +77,67 @@ One split, one run. 95% bootstrap intervals over jobs are in `data/results/task3
 | SBERT cosine | 0.321 | 0.584 | 21.5 | 0.640 | 0.803 |
 | Cross-encoder V1 (raw text) | 0.353 | 0.590 | 21.8 | 0.659 | 0.867 |
 | Cross-encoder V2 (+ Task 1 entities) | 0.399 | 0.637 | 20.2 | 0.682 | 0.833 |
-| **Cross-encoder V3 (+ Task 2 profile)** | **0.481** | **0.685** | **19.7** | **0.733** | **0.883** |
+| Cross-encoder V3 (+ Task 2 profile, baseline profiles) | 0.481 | 0.685 | 19.7 | 0.733 | 0.883 |
+| Cross-encoder V3 (+ Task 2 profile, JobBERT profiles) | 0.379 | 0.635 | 20.2 | 0.636 | 0.792 |
 
-- Supported by the intervals: V3 beats V1 and SBERT on Macro-F1, and beats the resume prior on NDCG@5 and MRR.
+- The two V3 rows differ only in where the Task 2 profile comes from: the baseline profiles (`profiles_t2.parquet`,
+  used for training the published weights) or the final JobBERT Task 2 model (`profiles_jobbert.parquet`, what `main.py`
+  produces). The two sources agree on Sub-field for only 54% of CVs.
+- With baseline profiles, V3 beats V1 and SBERT on Macro-F1 (the intervals exclude 0). **With the JobBERT profiles this
+  advantage disappears**: Macro-F1 0.379 is within noise of V1 (0.353) and SBERT (0.321). Both V3 variants are
+  statistically indistinguishable from each other (paired bootstrap, intervals include 0), so we cannot claim the profile
+  helps in general; it helped only when the profile source matched the one seen in training.
 - **Not** supported: V2 over V1 and V3 over V2 (the intervals include 0); read those as "tends to improve".
+
+Re-running with two more split/training seeds (43, 44; each seed has a different test set, so compare within a seed;
+`python task3_match/seed_check.py`, runs in `data/results/task3_seed_check*.csv`). Macro-F1 on test:
+
+| Model | seed 42 | seed 43 | seed 44 | mean ± std |
+|---|---|---|---|---|
+| V1 (raw text) | 0.353 | 0.319 | 0.392 | 0.355 ± 0.036 |
+| V2 (+ entities) | 0.399 | 0.441 | 0.412 | 0.418 ± 0.021 |
+| V3 (+ profile, baseline profiles) | 0.481 | 0.450 | 0.386 | 0.439 ± 0.048 |
+| V3 (+ profile, JobBERT profiles) | 0.379 | 0.370 | 0.414 | 0.388 ± 0.023 |
+
+- On average V1 is lowest and V2/V3 are higher, but the gaps (0.03-0.08) are about one standard deviation. With three
+  seeds we can say that adding Task 1 entities *tends* to help; we cannot rank V2 against either V3.
+- The best V3 (baseline profiles) was first on seeds 42 and 43 and last on seed 44, so its lead over V1 on seed 42 was
+  partly luck of the split. Ranking metrics are even noisier (MRR std up to 0.18 over about 26 jobs per test set).
+- The published weights (`Arxenarendra/jobbert-task3-match`) are the JobBERT-profile row (the second V3 row), so the demo
+  feeds the model the same kind of profile it was trained on. The baseline-profile weights stay on Hugging Face under tag
+  `v3-baseline-profiles`.
 - Task 1 (reported in its notebook): entity F1 on CV test 0.47 exact / 0.60 partial, on JD test 0.57 / 0.80.
 - Task 2: JobBERT was chosen on validation over the TF-IDF + Logistic Regression baselines; see
   `notebooks/task2_classification.ipynb` and the Hugging Face repo for its results.
-- Full table: `data/results/task3_final_seed42.csv`; error analysis: `data/results/task3_error_*.csv`; charts are
-  produced by `task3_match/analysis.py` into `figures/`.
+- Full table: `data/results/task3_final_seed42.csv`; error analysis of the demo model (V3 with JobBERT profiles):
+  `data/results/task3_error_*.csv` and `task3_confusion_V3jb.csv`; charts are produced by `task3_match/analysis.py`
+  into `figures/`. The demo model over-predicts Good Fit: 94 of 328 true No Fit pairs are called Good Fit (44 for the
+  baseline-profile V3), and only 2% of those false positives involve a CV that is too junior for the job.
+
+### Error propagation (how much Task 1 and Task 2 errors hurt matching)
+
+The matching dataset has no gold NER or gold Field for its CVs, so we cannot compare predicted against gold upstream
+labels. Instead the demo model stays fixed and its upstream input is made wrong on the test set: each CV (or job) gets the
+Task 1 entities or Task 2 profile of another random one, for 50% or 100% of them (`task3_match/error_propagation.py`,
+CPU; the clean run reproduces the Colab predictions, 99.8% same tier). Change versus clean input, 95% paired bootstrap
+interval over jobs in brackets:
+
+| Upstream input made wrong | Macro-F1 | ROC-AUC | NDCG@5 | Tier predictions changed |
+|---|---|---|---|---|
+| None (clean) | 0.379 | 0.635 | 0.642 | - |
+| Task 2 profile, 50% of CVs | -0.011 [-0.033, 0.011] | -0.003 [-0.020, 0.013] | +0.040 [-0.005, 0.092] | 9% |
+| Task 2 profile, all CVs | -0.008 [-0.046, 0.033] | **-0.026** [-0.046, -0.003] | +0.039 [-0.021, 0.105] | 16% |
+| Task 1 entities, 50% of CVs and jobs | **-0.056** [-0.116, -0.006] | **-0.089** [-0.177, -0.009] | -0.023 [-0.154, 0.092] | 28% |
+| Task 1 entities, all | -0.067 [-0.190, 0.047] | **-0.125** [-0.224, -0.036] | -0.096 [-0.279, 0.058] | 42% |
+| Both, all | -0.085 [-0.198, 0.023] | **-0.140** [-0.233, -0.060] | -0.145 [-0.320, 0.013] | 42% |
+
+- **Task 1 errors propagate**: wrong entities push ROC-AUC down to chance (0.51) and change 28-42% of tier calls.
+- **Task 2 errors barely do**: a completely wrong profile moves ROC-AUC by -0.03 and leaves Macro-F1 and ranking within
+  noise. The model has learned to rely little on the profile, which matches the ablation (V3 is not reliably above V2).
+  Consistently, clean accuracy is not lower where the two Task 2 models disagree on Sub-field (0.46, 348 pairs) than
+  where they agree (0.42, 308 pairs).
+- Limits: a swap is a worst-case error (another CV's output), not the partial errors a real model makes; and the model
+  was trained on predicted, already noisy, upstream outputs, which may be why it discounts the profile.
 
 ## Limitations
 
@@ -101,7 +153,7 @@ One split, one run. 95% bootstrap intervals over jobs are in `data/results/task3
 - **CV overlap between train and test:** 95-97% of test pairs use a CV that also appears in training (the split is per
   job, so jobs never overlap). A baseline that guesses the tier from the CV alone reaches Macro-F1 0.37, so Macro-F1
   alone overstates matching ability; the per-job ranking metrics are the more honest ones.
-- Small test set (26 jobs, 23 with at least 3 CVs) and a single seed. Entities from ATS-style text can contain words
+- Small test set (26 jobs, 23 with at least 3 CVs); the cross-encoder was run on three split seeds, the other analyses on seed 42 only. Entities from ATS-style text can contain words
   glued together (for example `analystlocation`).
 - The demo CVs and jobs in `examples/` are synthetic and the "expected" fits in `scripts/make_examples.py` are the
   authors' judgement.
@@ -125,11 +177,13 @@ models/                 downloaded weights (not in git)
 ```bash
 python task3_match/baselines.py     # majority, resume prior, BM25, SBERT over 3 split seeds (CPU)
 python task3_match/analysis.py      # bootstrap intervals, error analysis, charts, final table (CPU)
+python task3_match/seed_check.py    # cross-encoder variants over seeds 42/43/44 (needs the Colab predictions)
+python task3_match/error_propagation.py   # corrupt Task 1/Task 2 inputs to the demo model (CPU, ~40 min)
 ```
 
 The cross-encoder runs need a GPU: open `notebooks/task3_crossencoder_colab.ipynb` in Colab (it clones the repo with a
 `GH_TOKEN` secret, runs 8 fine-tuning runs, and saves results to Google Drive). Seed 42 everywhere; the per-job splits
-are stored in `data/splits/task3.json`.
+are stored in `data/splits/task3.json`. `notebooks/task3_seed_check_colab.ipynb` reruns the variants on seeds 43 and 44.
 
 ## Team
 
