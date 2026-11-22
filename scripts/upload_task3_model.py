@@ -1,4 +1,4 @@
-"""Upload the Task 3 cross-encoder (models/match/V3_cls_lr2e-05) to Hugging Face as a PUBLIC model.
+"""Upload the Task 3 cross-encoder (models/match/V3-jbprof_cls_lr2e-05) to Hugging Face as a PUBLIC model.
 
 Run once after logging in (python -c "from huggingface_hub import login; login()"):
     python scripts/upload_task3_model.py [repo_name]      # default repo_name: jobbert-task3-match
@@ -9,7 +9,7 @@ from pathlib import Path
 
 from huggingface_hub import HfApi
 
-folder = Path(__file__).resolve().parents[1] / "models" / "match" / "V3_cls_lr2e-05"
+folder = Path(__file__).resolve().parents[1] / "models" / "match" / "V3-jbprof_cls_lr2e-05"
 if not (folder / "model.safetensors").exists():
     sys.exit(f"Weights not found: {folder}")
 api = HfApi()
@@ -21,5 +21,5 @@ if not api.repo_exists(repo):    # a token without "create repo" permission can 
         sys.exit(f"Cannot create {repo}: {exc}\nUse a token with WRITE permission, or create the empty model "
                  f"repo '{repo}' on huggingface.co/new and run this script again.")
 api.upload_folder(folder_path=str(folder), repo_id=repo, allow_patterns=["*.json", "*.safetensors", "README.md"],
-                  commit_message="Task 3 cross-encoder V3")
+                  commit_message="Task 3 cross-encoder V3 trained with Task 2 JobBERT profiles")
 print(f"OK: https://huggingface.co/{repo}\nT3_MATCH_REPO = {repo}")

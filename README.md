@@ -45,18 +45,18 @@ python main.py --cv-dir examples/cvs --job examples/job1.txt
 ```
 python main.py --cv-dir examples/cvs --job examples/job2.txt        (job2 = Staff Accountant)
 #  CV        Score  Tier      Field / Sub-field / Level
-1  cv4.pdf    60.6  Good Fit  Finance / Accountant / Senior
-2  cv5.pdf    37.7  No Fit    Education & Health / Education / Senior
-3  cv2.pdf    37.7  No Fit    IT / Web Designing / Mid
-4  cv3.pdf    25.0  No Fit    Engineering & Construction / Mechanical Engineer / Senior
-5  cv1.pdf    25.0  No Fit    IT / Python Developer / Senior
+1  cv4.pdf    50.9  Potential Fit  Finance / Accountant / Senior
+2  cv5.pdf    42.8  No Fit    Education & Health / Education / Senior
+3  cv2.pdf    25.3  No Fit    IT / Web Designing / Mid
+4  cv3.pdf    25.3  No Fit    Engineering & Construction / Mechanical Engineer / Senior
+5  cv1.pdf    24.5  No Fit    IT / Python Developer / Senior
 
 python main.py --cv-dir examples/cvs --job examples/job1.txt        (job1 = Backend Software Engineer)
-1  cv2.pdf    73.8  Good Fit  IT / Web Designing / Mid
-2  cv1.pdf    73.8  Good Fit  IT / Python Developer / Senior
-3  cv5.pdf    60.6  Good Fit  Education & Health / Education / Senior
-4  cv3.pdf    46.7  No Fit    Engineering & Construction / Mechanical Engineer / Senior
-5  cv4.pdf    37.7  No Fit    Finance / Accountant / Senior
+1  cv2.pdf    74.9  Good Fit  IT / Web Designing / Mid
+2  cv1.pdf    64.8  Good Fit  IT / Python Developer / Senior
+3  cv5.pdf    55.3  Good Fit  Education & Health / Education / Senior
+4  cv3.pdf    50.9  No Fit    Engineering & Construction / Mechanical Engineer / Senior
+5  cv4.pdf    34.9  No Fit    Finance / Accountant / Senior
 ```
 
 Read these honestly: for the accountant job the order is sensible. For the backend job the model ranks the junior web
@@ -103,8 +103,9 @@ Re-running with two more split/training seeds (43, 44; each seed has a different
   seeds we can say that adding Task 1 entities *tends* to help; we cannot rank V2 against either V3.
 - The best V3 (baseline profiles) was first on seeds 42 and 43 and last on seed 44, so its lead over V1 on seed 42 was
   partly luck of the split. Ranking metrics are even noisier (MRR std up to 0.18 over about 26 jobs per test set).
-- The published weights (`Arxenarendra/jobbert-task3-match`) were trained on baseline profiles, but the CLI feeds them
-  JobBERT profiles, so the demo runs under the mismatch that produced the weaker row.
+- The published weights (`Arxenarendra/jobbert-task3-match`) are the JobBERT-profile row (the second V3 row), so the demo
+  feeds the model the same kind of profile it was trained on. The baseline-profile weights stay on Hugging Face under tag
+  `v3-baseline-profiles`.
 - Task 1 (reported in its notebook): entity F1 on CV test 0.47 exact / 0.60 partial, on JD test 0.57 / 0.80.
 - Task 2: JobBERT was chosen on validation over the TF-IDF + Logistic Regression baselines; see
   `notebooks/task2_classification.ipynb` and the Hugging Face repo for its results.

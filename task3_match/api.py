@@ -1,10 +1,10 @@
 """Task 3 API for the CLI: score_match() and rank().
 
 Model: Cross-Encoder V3 (jjzha/jobbert-base-cased fine-tuned, 3-class) = raw text + Task 1 entities + Task 2 profile,
-the best ablation variant in task3_match/analysis.py. The input is built by the SAME functions as training
+the variant that matches what main.py feeds it (see README for how it compares across seeds). The input is built by the SAME functions as training
 (task3_match/cross_encoder.py), so CLI inputs match what the model saw.
 
-Weights: models/match/V3_cls_lr2e-05/ (not in git). If missing, they are downloaded once from the public Hugging Face
+Weights: models/match/V3-jbprof_cls_lr2e-05/ (not in git). If missing, they are downloaded once from the public Hugging Face
 repo Arxenarendra/jobbert-task3-match (override with env T3_MATCH_REPO); if that fails, a clear error is raised
 (no silent fallback).
 
@@ -23,7 +23,7 @@ from common.schemas import FIT_TIERS, validate_match
 from task3_match.common import DATA, ROOT
 from task3_match.cross_encoder import encode, ent_str
 
-TAG = "V3_cls_lr2e-05"
+TAG = "V3-jbprof_cls_lr2e-05"   # trained with the Task 2 JobBERT profiles, the same source main.py feeds it
 MODEL_DIR = ROOT / "models" / "match" / TAG
 HF_REPO = os.environ.get("T3_MATCH_REPO", "Arxenarendra/jobbert-task3-match")
 MODEL_NAME = "Cross-Encoder V3 (JobBERT; raw text + Task 1 entities + Task 2 profile)"
@@ -37,7 +37,7 @@ def _model_dir() -> Path:
             snapshot_download(HF_REPO, local_dir=MODEL_DIR, allow_patterns=["*.json", "*.safetensors"])
         except Exception as exc:  # noqa: BLE001 - offline or repo unavailable
             raise FileNotFoundError(f"Task 3 weights missing in {MODEL_DIR} and download from {HF_REPO} failed ({exc}). "
-                                    "Connect to the internet, set T3_MATCH_REPO, or copy models/match/V3_cls_lr2e-05 manually.") from exc
+                                    "Connect to the internet, set T3_MATCH_REPO, or copy models/match/V3-jbprof_cls_lr2e-05 manually.") from exc
     return MODEL_DIR
 
 
