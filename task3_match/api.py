@@ -8,25 +8,32 @@ Weights: models/match/V3-jbprof_cls_lr2e-05/ (not in git). If missing, they are 
 repo Arxenarendra/jobbert-task3-match (override with env T3_MATCH_REPO); if that fails, a clear error is raised
 (no silent fallback).
 
-score = isotonic(E[tier]) fitted on the VAL rows of the training run (same as training), tier = argmax of the
-softmax probabilities. rank() orders by E[tier], which is continuous; the isotonic score is a step function with many ties.
+The cross-encoder alone saturates (most CVs near the top tier), so its probabilities are combined with explicit match
+signals by a small logistic-regression stacker (task3_match/stacking.py, fitted on validation, stored in
+data/cache/task3_stacker.json): skill coverage and job-title overlap from Task 1 entities, SBERT cosine, and the same
+three relative to the other CVs ranked for the job. So a CV's score depends on the other CVs it is ranked with.
+The stacker was fitted with peers, so a single CV (nothing to compare with) is scored by the cross-encoder alone.
+
+score = isotonic(E[tier]) of the stacker, fitted on validation; tier = argmax of the stacker probabilities.
+rank() orders by E[tier], which is continuous; the isotonic score is a step function with ties.
 """
+import json
 import os
 from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.isotonic import IsotonicRegression
 
 from common.schemas import FIT_TIERS, validate_match
-from task3_match.common import DATA, ROOT
+from task3_match.common import ROOT
 from task3_match.cross_encoder import encode, ent_str
+from task3_match.stacking import STACKER, features, signals, stack_probs, stack_score, tokens
 
 TAG = "V3-jbprof_cls_lr2e-05"   # trained with the Task 2 JobBERT profiles, the same source main.py feeds it
 MODEL_DIR = ROOT / "models" / "match" / TAG
 HF_REPO = os.environ.get("T3_MATCH_REPO", "Arxenarendra/jobbert-task3-match")
-MODEL_NAME = "Cross-Encoder V3 (JobBERT; raw text + Task 1 entities + Task 2 profile)"
+MODEL_NAME = "Cross-Encoder V3 (JobBERT; raw text + Task 1 entities + Task 2 profile) + match signals (stacked)"
 BATCH = 8
 
 
@@ -49,11 +56,26 @@ def _model():
 
 
 @lru_cache(maxsize=1)
-def _isotonic() -> IsotonicRegression:
-    """E[tier] -> ATS score, fitted on val rows of the saved training predictions (ats_score from outputs/ner/ats_pairs.parquet)."""
-    p = pd.read_parquet(DATA / "results" / f"task3_pred_{TAG}.parquet").query("split == 'val'")
+def _stacker() -> dict:
+    return json.loads(STACKER.read_text())
+
+
+@lru_cache(maxsize=1)
+def _ce_isotonic() -> dict:
+    """Cross-encoder E[tier] -> ATS score, fitted on the val rows of its training run (thresholds, like the stacker's)."""
+    from sklearn.isotonic import IsotonicRegression
+    p = pd.read_parquet(ROOT / "data" / "results" / f"task3_pred_{TAG}.parquet").query("split == 'val'")
     ats = pd.read_parquet(ROOT / "outputs" / "ner" / "ats_pairs.parquet").ats_score.values[p.row.values]
-    return IsotonicRegression(out_of_bounds="clip").fit(p[["p0", "p1", "p2"]].values @ [0, 1, 2], ats)
+    iso = IsotonicRegression(out_of_bounds="clip").fit(p[["p0", "p1", "p2"]].values @ [0, 1, 2], ats)
+    return {"iso_x": iso.X_thresholds_.tolist(), "iso_y": iso.y_thresholds_.tolist()}
+
+
+@lru_cache(maxsize=1)
+def _sbert():
+    from sentence_transformers import SentenceTransformer
+    from task3_match.baselines import SBERT
+    m = SentenceTransformer(SBERT, device="cpu"); m.max_seq_length = 256
+    return m
 
 
 def _texts(cv_text, cv_entities, cv_profile, job_text, job_entities):
@@ -75,9 +97,9 @@ def _probs(jobs: list[str], cvs: list[str]) -> np.ndarray:
     return np.concatenate(out)
 
 
-def _to_match(probs: np.ndarray) -> dict:
+def _to_match(probs: np.ndarray, calibration: dict) -> dict:
     expected = float(probs @ [0, 1, 2])
-    match = {"score": float(np.clip(_isotonic().predict([expected])[0], 0, 100)),
+    match = {"score": float(np.clip(stack_score(calibration, np.array([expected]))[0], 0, 100)),
              "tier": FIT_TIERS[int(probs.argmax())],
              "probs": {t: float(p) for t, p in zip(FIT_TIERS, probs)},
              "expected_tier": expected}
@@ -86,13 +108,24 @@ def _to_match(probs: np.ndarray) -> dict:
 
 
 def score_match(cv_text, cv_entities, cv_profile, job_text, job_entities) -> dict:
-    job, cv = _texts(cv_text, cv_entities, cv_profile, job_text, job_entities)
-    return _to_match(_probs([job], [cv])[0])
+    """One CV alone: cross-encoder only (see module docstring)."""
+    cv = {"name": "", "text": cv_text, "entities": cv_entities, "profile": cv_profile}
+    return rank([cv], {"text": job_text, "entities": job_entities})[0]["match"]
 
 
 def rank(cvs: list[dict], job: dict) -> list[dict]:
-    """cvs: [{"name", "text", "entities", "profile"}]; job: {"text", "entities"}. Sorted by E[tier], descending."""
+    """cvs: [{"name", "text", "entities", "profile"}]; job: {"text", "entities"}. Sorted by E[tier], descending.
+    Two or more CVs: stacker. One CV: cross-encoder alone, with its own isotonic score (fitted on validation)."""
+    from task3_match.baselines import sbert_embed
     pairs = [_texts(c["text"], c["entities"], c["profile"], job["text"], job["entities"]) for c in cvs]
-    probs = _probs([p[0] for p in pairs], [p[1] for p in pairs])
-    out = [{**c, "match": _to_match(p)} for c, p in zip(cvs, probs)]
+    ce = _probs([p[0] for p in pairs], [p[1] for p in pairs])
+    if len(cvs) == 1:
+        return [{**cvs[0], "match": _to_match(ce[0], _ce_isotonic())}]
+    js, jt = tokens(job["entities"]["SKILL"]), tokens(job["entities"]["JOB_TITLE"])
+    sig = [signals(js, tokens(c["entities"]["SKILL"]), jt, tokens(c["entities"]["JOB_TITLE"])) for c in cvs]
+    ej = sbert_embed(_sbert(), job["text"])
+    d = pd.DataFrame({"job_id": 0, "skill_cov": [x[0] for x in sig], "title_jac": [x[1] for x in sig],
+                      "sbert": [float(ej @ sbert_embed(_sbert(), c["text"])) for c in cvs]})
+    probs = stack_probs(_stacker(), features(d, ce))
+    out = [{**c, "match": _to_match(p, _stacker())} for c, p in zip(cvs, probs)]
     return sorted(out, key=lambda r: r["match"]["expected_tier"], reverse=True)

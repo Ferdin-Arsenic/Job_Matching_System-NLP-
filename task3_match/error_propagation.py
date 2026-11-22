@@ -1,6 +1,6 @@
 """Task 3 error propagation: how much do Task 1 (NER) and Task 2 (profile) errors hurt matching? CPU, test seed 42.
 
-Model = the demo model (V3 trained with Task 2 JobBERT profiles, task3_match/api.py). The matching dataset has no gold
+Model = the demo's cross-encoder (V3 trained with Task 2 JobBERT profiles), before the stacker in task3_match/stacking.py. The matching dataset has no gold
 NER or gold Field for its CVs, so "predicted vs gold" is not possible. Instead the trained model stays fixed and its
 upstream input is made wrong at test time (simulated upstream errors), then the drop is measured:
   clean        predicted entities + predicted profile (what the pipeline feeds it)
@@ -23,7 +23,8 @@ from sklearn.metrics import f1_score
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from task3_match.common import DATA, ROOT, TIERS, evaluate, get_splits, load
 from task3_match.cross_encoder import build_texts, encode, ent_str
-from task3_match.api import TAG, _isotonic, _model
+from sklearn.isotonic import IsotonicRegression
+from task3_match.api import TAG, _model
 
 SEED, DRAWS, RES = 42, 1000, DATA / "results"
 METRICS = ["macro_F1", "ROC_AUC", "NDCG@5", "MRR"]
@@ -87,7 +88,8 @@ stored = pd.read_parquet(RES / f"task3_pred_{TAG}.parquet").query("split == 'tes
 print(f"clean (CPU fp32) vs Colab predictions (fp16): max |diff| prob = {np.abs(P['clean'] - stored).max():.3f}, "
       f"same tier {np.mean(P['clean'].argmax(1) == stored.argmax(1)):.1%}")
 
-iso = _isotonic()
+_v = pd.read_parquet(RES / f"task3_pred_{TAG}.parquet").query("split == 'val'")      # same calibration as the training run
+iso = IsotonicRegression(out_of_bounds="clip").fit(_v[["p0", "p1", "p2"]].values @ [0, 1, 2], df.ats_score.values[_v.row.values])
 ev = lambda db, p: evaluate(db, p, iso.predict(p @ [0, 1, 2]), rank_score=p @ [0, 1, 2])
 point = {c: ev(d, p) for c, p in P.items()}
 jobs = d.job_id.unique(); by_job = {j: np.where(jid == j)[0] for j in jobs}; brng, draws = np.random.default_rng(SEED), []
