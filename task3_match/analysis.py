@@ -34,6 +34,9 @@ for v in ("V1", "V2", "V3"):
     p = pd.read_parquet(RES / f"task3_pred_{v}_cls_lr{LR}.parquet").query("split == 'test'").set_index("row").loc[te]
     pr = p[["p0", "p1", "p2"]].values; P[f"CE {v} (cls)"] = (pr, p.score.values, pr @ [0, 1, 2])   # ranking: E[tier]
 CE = [k for k in P if k.startswith("CE")]
+# V3 dgn profil Task 2 JobBERT (profiles_jobbert.parquet); sengaja di luar CE agar tidak masuk konfusi/error analysis (nama kolom m[3:5])
+_p = pd.read_parquet(RES / f"task3_pred_V3-jbprof_cls_lr{LR}.parquet").query("split == 'test'").set_index("row").loc[te]
+_pr = _p[["p0", "p1", "p2"]].values; P["V3-jbprof (cls)"] = (_pr, _p.score.values, _pr @ [0, 1, 2])
 
 
 # --- 1. bootstrap per job (resample job; semua resume job ikut) ---
@@ -55,7 +58,8 @@ boot = pd.DataFrame(rows); boot.to_csv(RES / "task3_bootstrap.csv", index=False)
 
 pairs = [("CE V2 (cls)", "CE V1 (cls)"), ("CE V3 (cls)", "CE V2 (cls)"), ("CE V3 (cls)", "CE V1 (cls)"),
          ("CE V1 (cls)", "SBERT cosine"), ("CE V3 (cls)", "SBERT cosine"), ("CE V1 (cls)", "Resume prior (no job)"),
-         ("CE V3 (cls)", "Resume prior (no job)")]
+         ("CE V3 (cls)", "Resume prior (no job)"), ("V3-jbprof (cls)", "CE V3 (cls)"), ("V3-jbprof (cls)", "CE V1 (cls)"),
+         ("V3-jbprof (cls)", "SBERT cosine")]
 rows = []
 for a, b in pairs:
     for k in METRICS:
@@ -116,12 +120,12 @@ print("\n== 10 contoh salah (V3 cls)\n" + ex[["arah", "true", "pred_tier", "p_pr
 
 # --- 5. chart ---
 INK, MUTED, GRID, GRAY = "#0b0b0b", "#52514e", "#e3e2de", "#9a9993"
-BLUE = {"CE V1 (cls)": "#8fbcf0", "CE V2 (cls)": "#4a8fe0", "CE V3 (cls)": "#1f5fb0"}
+BLUE = {"CE V1 (cls)": "#8fbcf0", "CE V2 (cls)": "#4a8fe0", "CE V3 (cls)": "#1f5fb0", "V3-jbprof (cls)": "#e08a2e"}
 plt.rcParams.update({"font.size": 10, "axes.edgecolor": GRID, "axes.labelcolor": MUTED, "xtick.color": MUTED, "ytick.color": INK,
                      "axes.spines.top": False, "axes.spines.right": False, "figure.facecolor": "white", "axes.facecolor": "white"})
-order = ["Resume prior (no job)", "SBERT cosine", "CE V1 (cls)", "CE V2 (cls)", "CE V3 (cls)"]
+order = ["Resume prior (no job)", "SBERT cosine", "CE V1 (cls)", "CE V2 (cls)", "CE V3 (cls)", "V3-jbprof (cls)"]
 label = {"Resume prior (no job)": "Resume prior (tanpa job)", "SBERT cosine": "SBERT cosine", "CE V1 (cls)": "Cross-encoder V1 (raw)",
-         "CE V2 (cls)": "Cross-encoder V2 (+entity)", "CE V3 (cls)": "Cross-encoder V3 (+profil)"}
+         "CE V2 (cls)": "Cross-encoder V2 (+entity)", "CE V3 (cls)": "Cross-encoder V3 (+profil baseline)", "V3-jbprof (cls)": "Cross-encoder V3 (+profil JobBERT)"}
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.6), sharey=True)
 for ax, k, title in zip(axes, ["macro_F1", "NDCG@5", "MRR"], ["Macro-F1 (tier)", "NDCG@5 (ranking per job)", "MRR (ranking per job)"]):
     for i, m in enumerate(order):

@@ -77,10 +77,19 @@ One split, one run. 95% bootstrap intervals over jobs are in `data/results/task3
 | SBERT cosine | 0.321 | 0.584 | 21.5 | 0.640 | 0.803 |
 | Cross-encoder V1 (raw text) | 0.353 | 0.590 | 21.8 | 0.659 | 0.867 |
 | Cross-encoder V2 (+ Task 1 entities) | 0.399 | 0.637 | 20.2 | 0.682 | 0.833 |
-| **Cross-encoder V3 (+ Task 2 profile)** | **0.481** | **0.685** | **19.7** | **0.733** | **0.883** |
+| Cross-encoder V3 (+ Task 2 profile, baseline profiles) | 0.481 | 0.685 | 19.7 | 0.733 | 0.883 |
+| Cross-encoder V3 (+ Task 2 profile, JobBERT profiles) | 0.379 | 0.635 | 20.2 | 0.636 | 0.792 |
 
-- Supported by the intervals: V3 beats V1 and SBERT on Macro-F1, and beats the resume prior on NDCG@5 and MRR.
+- The two V3 rows differ only in where the Task 2 profile comes from: the baseline profiles (`profiles_t2.parquet`,
+  used for training the published weights) or the final JobBERT Task 2 model (`profiles_jobbert.parquet`, what `main.py`
+  produces). The two sources agree on Sub-field for only 54% of CVs.
+- With baseline profiles, V3 beats V1 and SBERT on Macro-F1 (the intervals exclude 0). **With the JobBERT profiles this
+  advantage disappears**: Macro-F1 0.379 is within noise of V1 (0.353) and SBERT (0.321). Both V3 variants are
+  statistically indistinguishable from each other (paired bootstrap, intervals include 0), so we cannot claim the profile
+  helps in general; it helped only when the profile source matched the one seen in training.
 - **Not** supported: V2 over V1 and V3 over V2 (the intervals include 0); read those as "tends to improve".
+- The published weights (`Arxenarendra/jobbert-task3-match`) were trained on baseline profiles, but the CLI feeds them
+  JobBERT profiles, so the demo runs under the mismatch that produced the weaker row.
 - Task 1 (reported in its notebook): entity F1 on CV test 0.47 exact / 0.60 partial, on JD test 0.57 / 0.80.
 - Task 2: JobBERT was chosen on validation over the TF-IDF + Logistic Regression baselines; see
   `notebooks/task2_classification.ipynb` and the Hugging Face repo for its results.
