@@ -31,7 +31,8 @@ python main.py --cv examples/cvs/cv1.pdf --job examples/job1.txt --verbose
 python main.py --cv-dir examples/cvs --job examples/job1.txt
 ```
 
-`--job` takes a `.txt` path or the job text itself; `--cv` takes `.pdf` or `.txt`.
+`--job` takes a `.txt` or `.pdf` path or the job text itself (the examples exist in both formats: `examples/job1.pdf`);
+`--cv` takes `.pdf` or `.txt`.
 
 - **First run downloads about 1.4 GB** of weights (Task 1 ~430 MB, Task 2 ~415 MB, Task 3 ~433 MB, SBERT ~90 MB) into `models/` and the Hugging Face cache. It took about 5 minutes on one connection; later runs reuse them.
 - After that a run takes about 20 s for one CV and about 25-30 s for five CVs on a laptop CPU (measured, including model loading).

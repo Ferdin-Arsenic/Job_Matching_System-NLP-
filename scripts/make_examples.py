@@ -1,4 +1,4 @@
-"""Write the demo inputs: examples/job{1,2}.txt and examples/cvs/cv{1..5}.pdf.
+"""Write the demo inputs: examples/job{1,2}.{txt,pdf} and examples/cvs/cv{1..5}.pdf.
 All text is synthetic; the "expected" notes are the author's judgement, not ground truth.
 Run from repo root: python scripts/make_examples.py (needs fpdf2)"""
 from pathlib import Path
@@ -157,6 +157,7 @@ if __name__ == "__main__":
     (OUT / "cvs").mkdir(parents=True, exist_ok=True)
     for name, text in JOBS.items():
         (OUT / name).write_text(text, encoding="utf-8")
+        write_pdf(OUT / name.replace(".txt", ".pdf"), text)
     for name, text in CVS.items():
         write_pdf(OUT / "cvs" / name, text)
     print("written:", sorted(p.name for p in OUT.rglob("*") if p.is_file()))

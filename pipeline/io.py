@@ -1,4 +1,4 @@
-"""Read CV (PDF/TXT) and job description (TXT path or literal text)."""
+"""Read CV (PDF/TXT) and job description (PDF/TXT path or literal text)."""
 from pathlib import Path
 
 
@@ -41,11 +41,17 @@ def read_cv(path) -> str:
 
 def read_job(value: str) -> str:
     path = Path(value)
+    ext = path.suffix.lower()
     try:
-        is_file = path.suffix.lower() == ".txt" and path.is_file()
+        is_file = ext in (".txt", ".pdf") and path.is_file()
     except OSError:  # very long literal text is not a valid path
         is_file = False
-    text = path.read_text(encoding="utf-8") if is_file else value
+    if is_file:
+        text = _pdf_text(path) if ext == ".pdf" else path.read_text(encoding="utf-8")
+    elif ext in (".txt", ".pdf") and not any(c.isspace() for c in value):
+        raise InputError(f"Job file not found: {value}")  # a one-token '*.txt/*.pdf' is a mistyped path, not job text
+    else:
+        text = value
     if not text.strip():
         raise InputError("Job description is empty")
     return text
